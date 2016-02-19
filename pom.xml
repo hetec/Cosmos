@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.pode.cosmos</groupId>
+    <artifactId>cosmos</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.version>1.0-SNAPSHOT</project.version>
+        <project.name>EarTemplate</project.name>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- java version -->
+        <java.version>1.8</java.version>
+        <!-- ejb -->
+        <ejb.version>3.2</ejb.version>
+        <!-- javaEE version -->
+        <javaEE.version>7.0</javaEE.version>
+        <!-- Compiler plugin version -->
+        <plugin.compiler.version>3.3</plugin.compiler.version>
+        <!-- War plugin version -->
+        <plugin.war.version>2.6</plugin.war.version>
+        <!-- EJB plugin version -->
+        <plugin.ejb.version>2.5.1</plugin.ejb.version>
+        <!-- Ear plugin version -->
+        <plugin.ear.version>2.10.1</plugin.ear.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>${javaEE.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <finalName>cosmos</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${plugin.compiler.version}</version>
+                    <configuration>
+                        <target>${java.version}</target>
+                        <source>${java.version}</source>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ejb-plugin</artifactId>
+                    <version>${plugin.ejb.version}</version>
+                    <configuration>
+                        <ejbVersion>${ejb.version}</ejbVersion>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${plugin.war.version}</version>
+                    <!--<configuration>-->
+                    <!--&lt;!&ndash;If your web.xml does not exist in WEB-INF&ndash;&gt;-->
+                    <!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
+                    <!--&lt;!&ndash;The alternative source of your web.xml&ndash;&gt;-->
+                    <!--<webResources>-->
+                    <!--<resource>-->
+                    <!--&lt;!&ndash; The path to the directory&ndash;&gt;-->
+                    <!--<directory>src/main/myRes</directory>-->
+                    <!--&lt;!&ndash; New destination of web.xml &ndash;&gt;-->
+                    <!--<targetPath>WEB-INF</targetPath>-->
+                    <!--&lt;!&ndash;includes only web.xml&ndash;&gt;-->
+                    <!--<includes>-->
+                    <!--<include>**/web.xml</include>-->
+                    <!--</includes>-->
+                    <!--</resource>-->
+                    <!--</webResources>-->
+                    <!--</configuration>-->
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>${plugin.ear.version}</version>
+                    <configuration>
+                        <modules>
+                            <webModule>
+                                <groupId>org.pode.cosmos</groupId>
+                                <artifactId>WebModule</artifactId>
+                                <unpack>true</unpack>
+                            </webModule>
+                            <ejbModule>
+                                <groupId>org.pode.cosmos</groupId>
+                                <artifactId>ServiceModule</artifactId>
+                                <unpack>true</unpack>
+                            </ejbModule>
+                            <ejbModule>
+                                <groupId>org.pode.cosmos</groupId>
+                                <artifactId>DomainModule</artifactId>
+                                <unpack>true</unpack>
+                            </ejbModule>
+                        </modules>
+                        <generateApplicationXml>true</generateApplicationXml>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+
+  <modules>
+    <module>WebModule</module>
+    <module>ServiceModule</module>
+    <module>EarModule</module>
+    <module>DomainModule</module>
+  </modules>
+</project>

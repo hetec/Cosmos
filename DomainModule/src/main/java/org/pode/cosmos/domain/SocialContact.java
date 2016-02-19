@@ -1,14 +1,16 @@
-package org.pode.cosomos.domain;
+package org.pode.cosmos.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
  * Created by patrick on 19.02.16.
  */
+@XmlRootElement
 @Entity
 public class SocialContact implements Serializable{
 

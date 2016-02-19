@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+    <persistence-unit name="cosmos-persitence-unit" transaction-type="JTA">
+        <description>Persistence provider for the cosmos app</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/db"/>
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby"/>
+            <property name="javax.persistence.jdbc.user" value="derbyuser"/>
+            <property name="javax.persistence.jdbc.password" value="derbyuser"/>
+        </properties>
+    </persistence-unit>
+</persistence>

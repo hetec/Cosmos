@@ -1,4 +1,4 @@
-package org.pode.cosmos.appconfig;
+package appconfig;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

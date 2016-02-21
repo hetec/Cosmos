@@ -24,12 +24,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.pode.cosmos</groupId>
-            <artifactId>DomainModule</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
     <build>
         <finalName>WebModule</finalName>

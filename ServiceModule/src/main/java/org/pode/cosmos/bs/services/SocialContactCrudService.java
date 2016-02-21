@@ -1,5 +1,6 @@
-package org.pode.cosmos.bs.interfaces;
+package org.pode.cosmos.bs.services;
 
+import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.domain.SocialContact;
 
@@ -11,24 +12,24 @@ import javax.persistence.EntityManager;
  * Created by patrick on 19.02.16.
  */
 @Stateless
-public class SocialContactService implements SocialContactServiceLocal{
-//    @Inject @CosmosCtx
+public class SocialContactCrudService implements SocialContactCrudServiceLocal {
     private EntityManager em;
 
-    public SocialContactService() {}
+    public SocialContactCrudService() {}
 
     @Inject
-    public SocialContactService(@CosmosCtx EntityManager em){
+    public SocialContactCrudService(@CosmosCtx EntityManager em){
         this.em = em;
     }
 
     @Override
-    public SocialContact getSocialContact(Long id) {
+    public SocialContact findById(Long id) {
         return em.find(SocialContact.class, id);
     }
 
     @Override
     public SocialContact save(SocialContact socialContact) {
-       return null;
+        em.persist(socialContact);
+        return socialContact;
     }
 }

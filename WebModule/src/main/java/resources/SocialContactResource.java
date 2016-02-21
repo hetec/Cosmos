@@ -1,12 +1,15 @@
 package resources;
 
-import org.pode.cosmos.bs.interfaces.SocialContactServiceLocal;
+import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.domain.SocialContact;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 /**
  * Created by patrick on 19.02.16.
@@ -15,13 +18,13 @@ import javax.ws.rs.core.Response;
 @Path("/contacts")
 @Produces("application/json")
 @Consumes("application/json")
-public class SocialContactResource {
+public class SocialContactResource{
 
-    SocialContactServiceLocal socialContactService;
+    SocialContactCrudServiceLocal socialContactCrudService;
 
     @Inject
-    public SocialContactResource(SocialContactServiceLocal socialContactService){
-        this.socialContactService = socialContactService;
+    public SocialContactResource(SocialContactCrudServiceLocal socialContactCrudService){
+        this.socialContactCrudService = socialContactCrudService;
     }
 
     public SocialContactResource(){}
@@ -29,9 +32,17 @@ public class SocialContactResource {
     @GET
     @Path("{id}")
     public Response getContact(@PathParam("id") Long id){
-        SocialContact socialContact = socialContactService.getSocialContact(id);
+        SocialContact socialContact = socialContactCrudService.findById(id);
         return Response.ok(socialContact).build();
     }
+
+    @POST
+    public Response saveContact(SocialContact socialContact, @Context UriInfo uriInfo){
+        SocialContact persistedContact = socialContactCrudService.save(socialContact);
+        URI uri = uriInfo.getBaseUriBuilder().path(SocialContactResource.class).path(persistedContact.getId().toString()).build();
+        return Response.created(uri).build();
+    }
+
 
 
 }

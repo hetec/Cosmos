@@ -8,9 +8,9 @@ import javax.ejb.Local;
  * Created by patrick on 19.02.16.
  */
 @Local
-public interface SocialContactServiceLocal {
+public interface SocialContactCrudServiceLocal {
 
-    SocialContact getSocialContact(Long id);
+    SocialContact findById(Long id);
 
     SocialContact save(SocialContact socialContact);
 

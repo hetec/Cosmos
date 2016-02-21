@@ -1,5 +1,7 @@
 package resources;
 
+import org.pode.cosmos.domain.SocialContact;
+
 import javax.ejb.Local;
 
 /**
@@ -9,5 +11,7 @@ import javax.ejb.Local;
 public interface SocialContactResourceLocal {
 
     String getContact(Long id);
+
+    void saveContact(SocialContact socialContact);
 
 }

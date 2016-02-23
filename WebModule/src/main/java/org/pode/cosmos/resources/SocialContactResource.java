@@ -1,4 +1,4 @@
-package resources;
+package org.pode.cosmos.resources;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.domain.SocialContact;

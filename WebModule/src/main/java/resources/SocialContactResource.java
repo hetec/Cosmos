@@ -10,6 +10,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Created by patrick on 19.02.16.
@@ -30,6 +31,12 @@ public class SocialContactResource{
     public SocialContactResource(){}
 
     @GET
+    public Response getAllContacts(){
+        List<SocialContact> allContacts = socialContactCrudService.findAll();
+        return Response.ok(allContacts).build();
+    }
+
+    @GET
     @Path("{id}")
     public Response getContact(@PathParam("id") Long id){
         SocialContact socialContact = socialContactCrudService.findById(id);
@@ -39,10 +46,21 @@ public class SocialContactResource{
     @POST
     public Response saveContact(SocialContact socialContact, @Context UriInfo uriInfo){
         SocialContact persistedContact = socialContactCrudService.save(socialContact);
-        URI uri = uriInfo.getBaseUriBuilder().path(SocialContactResource.class).path(persistedContact.getId().toString()).build();
+        URI uri = uriInfo.getBaseUriBuilder()
+                .path(SocialContactResource.class)
+                .path(persistedContact.getId().toString())
+                .build();
         return Response.created(uri).build();
     }
 
-
+    @PUT
+    @Path("{id}")
+    public Response updateContact(SocialContact socialContact,
+                                  @PathParam("id") Long id,
+                                  @Context UriInfo uriInfo){
+        socialContact.setId(id);
+        SocialContact updatedContact = socialContactCrudService.update(socialContact);
+        return Response.ok(updatedContact).build();
+    }
 
 }

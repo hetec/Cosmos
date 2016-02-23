@@ -1,9 +1,6 @@
 package org.pode.cosmos.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
@@ -12,6 +9,10 @@ import java.io.Serializable;
  */
 @XmlRootElement
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "socialContact.findAll",
+                    query = "SELECT sc FROM SocialContact sc")
+})
 public class SocialContact implements Serializable{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,6 +7,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -33,7 +34,8 @@ public class SocialContactResource{
     @GET
     public Response getAllContacts(){
         List<SocialContact> allContacts = socialContactCrudService.findAll();
-        return Response.ok(allContacts).build();
+        GenericEntity<List<SocialContact>> list = new GenericEntity<List<SocialContact>>(allContacts){};
+        return Response.ok(list).build();
     }
 
     @GET
@@ -61,6 +63,14 @@ public class SocialContactResource{
         socialContact.setId(id);
         SocialContact updatedContact = socialContactCrudService.update(socialContact);
         return Response.ok(updatedContact).build();
+    }
+
+    @DELETE
+    @Consumes("*/*")
+    @Path("{id}")
+    public Response deleteContact(@PathParam("id") Long id){
+        SocialContact removedContact = socialContactCrudService.delete(id);
+        return Response.ok(removedContact).build();
     }
 
 }

@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by patrick on 19.02.16.
@@ -51,5 +52,12 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
             throw new IllegalArgumentException("Social contact id does not exist!");
         }
         return em.merge(socialContact);
+    }
+
+    @Override
+    public SocialContact delete(Long id) {
+        SocialContact removedContact = findById(id);
+        em.remove(removedContact);
+        return removedContact;
     }
 }

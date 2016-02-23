@@ -19,4 +19,6 @@ public interface SocialContactCrudServiceLocal {
 
     SocialContact update(SocialContact socialContact);
 
+    SocialContact delete(Long id);
+
 }

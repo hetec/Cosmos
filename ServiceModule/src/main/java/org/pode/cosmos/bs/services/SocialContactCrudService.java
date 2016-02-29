@@ -66,7 +66,7 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
 
     @Override
     public SocialContact delete(Long id) {
-        SocialContact removedContact = findById(id);
+        SocialContact removedContact = em.find(SocialContact.class, id);
         try {
             em.remove(removedContact);
         }catch (IllegalArgumentException exception){

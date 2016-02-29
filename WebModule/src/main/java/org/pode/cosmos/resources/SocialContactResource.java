@@ -1,15 +1,13 @@
 package org.pode.cosmos.resources;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
+import org.pode.cosmos.bs.services.SocialContactCrudService;
 import org.pode.cosmos.domain.SocialContact;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
 
@@ -35,14 +33,20 @@ public class SocialContactResource{
     public Response getAllContacts(){
         List<SocialContact> allContacts = socialContactCrudService.findAll();
         GenericEntity<List<SocialContact>> list = new GenericEntity<List<SocialContact>>(allContacts){};
-        return Response.ok(list).build();
+        return Response
+                .ok(list)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .build();
     }
 
     @GET
     @Path("{id}")
     public Response getContact(@PathParam("id") Long id){
         SocialContact socialContact = socialContactCrudService.findById(id);
-        return Response.ok(socialContact).build();
+        return Response
+                .ok(socialContact)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .build();
     }
 
     @POST
@@ -52,7 +56,10 @@ public class SocialContactResource{
                 .path(SocialContactResource.class)
                 .path(persistedContact.getId().toString())
                 .build();
-        return Response.created(uri).build();
+        return Response
+                .created(uri)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .build();
     }
 
     @PUT
@@ -62,7 +69,10 @@ public class SocialContactResource{
                                   @Context UriInfo uriInfo){
         socialContact.setId(id);
         SocialContact updatedContact = socialContactCrudService.update(socialContact);
-        return Response.ok(updatedContact).build();
+        return Response
+                .ok(updatedContact)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .build();
     }
 
     @DELETE
@@ -70,7 +80,10 @@ public class SocialContactResource{
     @Path("{id}")
     public Response deleteContact(@PathParam("id") Long id){
         SocialContact removedContact = socialContactCrudService.delete(id);
-        return Response.ok(removedContact).build();
+        return Response
+                .ok(removedContact)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .build();
     }
 
 }

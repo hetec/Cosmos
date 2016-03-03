@@ -22,6 +22,13 @@ public class SocialContact implements Serializable{
 
     private String lastName;
 
+    public SocialContact(){}
+
+    public SocialContact(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public Long getId() {
         return id;
     }

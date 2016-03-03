@@ -1,10 +1,12 @@
 package org.pode.cosmos.resources;
 
+import com.sun.org.apache.xerces.internal.util.Status;
+import com.sun.xml.internal.ws.server.UnsupportedMediaException;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.wadl.internal.generators.ObjectFactory;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.util.server.ContainerRequestBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -12,16 +14,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.domain.SocialContact;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
+import org.pode.cosmos.exceptions.handler.GenericExceptionMapper;
 import org.pode.cosmos.exceptions.handler.NoSuchEntityForIdMapper;
+import org.pode.cosmos.exceptions.handler.NotSupportedMediaTypeMapper;
 import org.pode.cosmos.exceptions.model.ExceptionInfo;
 
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -43,19 +46,37 @@ public class SocialContactResourceTest extends JerseyTest{
         res.register(new TestBinder());
         res.register(SocialContactResource.class);
         res.register(NoSuchEntityForIdMapper.class);
+        res.register(GenericExceptionMapper.class);
+        res.register(NotSupportedMediaTypeMapper.class);
         return res;
     }
 
     @Test
     public void getAllContacts_noProblems_StatusCodeOK(){
         Response response = target("/contacts").request().get(Response.class);
-        assertThat(response.getStatusInfo(), equalTo(Response.Status.OK));
+
+        verifyStatusCode(response, Response.Status.OK);
     }
 
     @Test
     public void getAllContacts_noProblems_MediaTypeAppJson(){
         Response response = target("/contacts").request().get(Response.class);
-        assertThat(response.getMediaType(), equalTo(MediaType.APPLICATION_JSON_TYPE));
+
+        verifyMediatypeIsAppJson(response);
+    }
+
+    @Test
+    public void getAllContacts_wrongMediaType_NotSupportedMediaType(){
+        ExceptionInfo ei = new ExceptionInfo(
+                NotSupportedException.class.getName(),
+                "HTTP 415 Unsupported Media Type",
+                "Supported media types: application/json"
+        );
+        Response response = target("/contacts")
+                .request().header("Content-Type", MediaType.APPLICATION_XML)
+                .get(Response.class);
+
+        verifyExceptionInfo(response,ei);
     }
 
     @Test
@@ -65,7 +86,6 @@ public class SocialContactResourceTest extends JerseyTest{
 
         Response response = target("/contacts").request().get(Response.class);
 
-        verify(service, times(1)).findAll();
         assertThat(response.readEntity(new GenericType<List<SocialContact>>(){}).size(), equalTo(0));
     }
 
@@ -78,107 +98,213 @@ public class SocialContactResourceTest extends JerseyTest{
 
         Response response = target("/contacts").request().get(Response.class);
 
-        verify(service, times(1)).findAll();
         assertThat(response.readEntity(new GenericType<List<SocialContact>>(){}).size(), equalTo(2));
     }
 
     @Test
     public void getContactById_idOne_StatusCodeOK(){
         Response response = target("/contacts/1").request().get(Response.class);
-        assertThat(response.getStatusInfo(), equalTo(Response.Status.OK));
+        verifyStatusCode(response, Response.Status.OK);
     }
 
     @Test
     public void getContactById_idOne_MediaTypeAppJson(){
         Response response = target("/contacts/1").request().get(Response.class);
-        assertThat(response.getMediaType(), equalTo(MediaType.APPLICATION_JSON_TYPE));
+        verifyMediatypeIsAppJson(response);
     }
 
     @Test
     public void getContactById_idOne_validSocialContactObject(){
-        final String firstName = "John";
-        final String lastName = "Doe";
-        final Long id = 1L;
-
-        SocialContact contact = new SocialContact();
-        contact.setFirstName(firstName);
-        contact.setLastName(lastName);
-        contact.setId(id);
+        SocialContact contact = createTestContact();
         when(service.findById(1L)).thenReturn(contact);
 
         Response response = target("/contacts/1").request().get(Response.class);
 
-        SocialContact foundContact = response.readEntity(new GenericType<SocialContact>(){});
-        assertThat(foundContact.getFirstName(), equalTo(firstName));
-        assertThat(foundContact.getLastName(), equalTo(lastName));
-        assertThat(foundContact.getId(), equalTo(id));
+        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
     }
 
     @Test
     public void getContactById_NoEntityExistsForId_ExceptionInfo(){
-        final String ERR_MSG = "error";
+        final ExceptionInfo ei = new ExceptionInfo(
+                NoSuchEntityForIdException.class.getName(),
+                "error",
+                "The entity with the id #1 does not exist");
         final long ID = 1L;
-        final String ERR_INFO = "The entity with the id #1 does not exist";
-        when(service.findById(1L)).thenThrow(new NoSuchEntityForIdException(ID, ERR_MSG));
+        when(service.findById(1L)).thenThrow(new NoSuchEntityForIdException(ID, ei.getErrorMsg()));
 
         Response response = target("/contacts/1").request().get(Response.class);
-
-        ExceptionInfo errInfo = response.readEntity(new GenericType<ExceptionInfo>(){});
-        assertThat(errInfo.getExceptionClass(), equalTo(NoSuchEntityForIdException.class.getName()));
-        assertThat(errInfo.getErrorMsg(), equalTo(ERR_MSG));
-        assertThat(errInfo.getErrorInfo(), equalTo(ERR_INFO));
+        verifyExceptionInfo(response, ei);
     }
 
     @Test
     public void saveContact_validEntityAsBody_StatusCodeCreated(){
-        SocialContact sc = new SocialContact();
-        sc.setFirstName("John");
-        sc.setLastName("Doe");
-        sc.setId(1L);
+        SocialContact sc = createTestContact();
 
-        when(service.save(sc)).thenReturn(sc);
+        when(service.save(any(SocialContact.class))).thenReturn(sc);
 
-        Entity<SocialContact> contactEntity = Entity.entity(sc, MediaType.APPLICATION_JSON_TYPE);
-        Response response = target("/contacts").request().post(contactEntity);
-        assertThat(response.getStatusInfo(), equalTo(Response.Status.CREATED));
+        Response response = target("/contacts").request().post(wrapIntoEntity(sc));
+        verifyStatusCode(response, Response.Status.CREATED);
     }
 
     @Test
-    public void saveContact_validEntityAsBody_MediaTypeAppJson(){
-        SocialContact sc = new SocialContact();
-        sc.setFirstName("John");
-        sc.setLastName("Doe");
-        sc.setId(1L);
+    public void saveContact_validEntityAsBody_MediaTypeAppJson() {
+        SocialContact sc = createTestContact();
 
-        when(service.save(sc)).thenReturn(sc);
+        when(service.save(any(SocialContact.class))).thenReturn(sc);
 
-        Entity<SocialContact> contactEntity = Entity.entity(sc, MediaType.APPLICATION_JSON_TYPE);
-        Response response = target("/contacts").request().post(contactEntity);
-        assertThat(response.getMediaType(), equalTo(MediaType.APPLICATION_JSON_TYPE));
+        Response response = target("/contacts").request().post(wrapIntoEntity(sc));
+        verifyMediatypeIsAppJson(response);
     }
 
     @Test
     public void saveContact_validEntityAsBody_validSocialContactObject(){
-        SocialContact sc = new SocialContact();
-        sc.setFirstName("John");
-        sc.setLastName("Doe");
-        sc.setId(1L);
+        SocialContact sc = createTestContact();
+        when(service.save(any(SocialContact.class))).thenReturn(sc);
 
-        when(service.save(sc)).thenReturn(sc);
+        Response response = target("/contacts").request().post(wrapIntoEntity(sc));
 
-        Entity<SocialContact> contactEntity = Entity.entity(sc, MediaType.APPLICATION_JSON_TYPE);
-        Response response = target("/contacts").request().post(contactEntity);
-        MultivaluedMap<String,Object> headers = response.getHeaders();
-        String location = (String)headers.getFirst("location");
-        assertThat(location, equalTo("http://localhost:9998/contacts/1"));
+        verifyHeaderValue(response, "location", "http://localhost:9998/contacts/1");
     }
 
     @Test
-    public void saveContact_noObjectAsBody_BadRequest(){
-        Entity<SocialContact> contactEntity = Entity.entity(null, MediaType.APPLICATION_JSON_TYPE);
-        Response response = target("/contacts").request().post(contactEntity);
+    public void saveContact_noObjectAsBody_ExceptionInfo(){
+        ExceptionInfo ei = new ExceptionInfo(
+                WebApplicationException.class.getName(),
+                "HTTP 400 Bad Request",
+                "Unexpected"
+        );
+        Response response = target("/contacts").request().post(wrapIntoEntity(null));
 
-        assertThat(response.getStatus(), equalTo(Response.Status.BAD_REQUEST.getStatusCode()));
+        verifyExceptionInfo(response, ei);
+    }
+
+    @Test
+    public void updateContact_validEntityAsBody_StatusCodeOK(){
+        SocialContact sc = createTestContact();
+        when(service.update(any(SocialContact.class))).thenReturn(sc);
+
+        Response response = target("/contacts/1").request().put(wrapIntoEntity(sc));
+
+        verifyStatusCode(response, Response.Status.OK);
+    }
+
+    @Test
+    public void updateContact_validEntityAsBody_MediaTypeAppJson(){
+        SocialContact sc = createTestContact();
+        when(service.update(any(SocialContact.class))).thenReturn(sc);
+
+        Response response = target("/contacts/1").request().put(wrapIntoEntity(sc));
+
+        verifyMediatypeIsAppJson(response);
+    }
+
+    @Test
+    public void updateContact_validEntityAsBody_ValidSocialContact(){
+        SocialContact sc = createTestContact();
+        when(service.update(any(SocialContact.class))).thenReturn(sc);
+
+        Response response = target("/contacts/1").request().put(wrapIntoEntity(sc));
+
+        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
+    }
+
+    @Test
+    public void updateContact_NoEntityForId_NoSuchEntityForIdException(){
+        ExceptionInfo ei = new ExceptionInfo(
+                NoSuchEntityForIdException.class.getName(),
+                "error",
+                "The entity with the id #1 does not exist"
+        );
+        when(service.update(any(SocialContact.class))).thenThrow(
+                new NoSuchEntityForIdException(1L, ei.getErrorMsg()));
+
+        Response response = target("/contacts/1").request().put(wrapIntoEntity(createTestContact()));
+
+        verifyExceptionInfo(response, ei);
+    }
+
+    @Test
+    public void deleteContact_noProblems_StatusCodeOK(){
+        Response response = target("/contacts/1").request().delete();
+
+        verifyStatusCode(response, Response.Status.OK);
+    }
+
+    @Test
+    public void deleteContact_noProblems_MediaTypeAppJson(){
+        Response response = target("/contacts/1").request().delete();
+
+        verifyMediatypeIsAppJson(response);
+    }
+
+    @Test
+    public void deleteContact_noProblems_deletedSocialContact(){
+        SocialContact sc = createTestContact();
+        when(service.delete(1L)).thenReturn(sc);
+
+        Response response = target("/contacts/1").request().delete();
+
+        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
+    }
+
+    @Test
+    public void deleteContact_noSuchEntity_NoSuchEntityForIdException(){
+        ExceptionInfo ei = new ExceptionInfo(
+                NoSuchEntityForIdException.class.getName(),
+                "error",
+                "The entity with the id #1 does not exist"
+        );
+        when(service.delete(1L)).thenThrow(new NoSuchEntityForIdException(1L, ei.getErrorMsg()));
+
+        Response response = target("/contacts/1").request().delete();
+
+        verifyExceptionInfo(response, ei);
+    }
+
+    //Helper
+    private static SocialContact createTestContact(){
+        SocialContact sc = new SocialContact("John", "Doe");
+        sc.setId(1L);
+        return sc;
+    }
+
+    private static SocialContact createTestContact(final Long id, String first, String last){
+        SocialContact sc = new SocialContact(first, last);
+        sc.setId(id);
+        return sc;
+    }
+
+    private static void verifyMediatypeIsAppJson(Response response){
+        assertThat(response.getMediaType(), equalTo(MediaType.APPLICATION_JSON_TYPE));
+    }
+
+    private static void verifyStatusCode(Response response, Response.Status code){
+        assertThat(response.getStatusInfo(), equalTo(code));
+    }
+
+    private static void verifySocialContactProperties(Response response, SocialContact matcher){
+        SocialContact actual = response.readEntity(new GenericType<SocialContact>(){});
+        assertThat(actual.getFirstName(), equalTo(matcher.getFirstName()));
+        assertThat(actual.getLastName(), equalTo(matcher.getLastName()));
+        assertThat(actual.getId(), equalTo(matcher.getId()));
+    }
+
+    private static void verifyExceptionInfo(Response response,
+                                            ExceptionInfo matcher){
+        ExceptionInfo errInfo = response.readEntity(new GenericType<ExceptionInfo>(){});
+        assertThat(errInfo.getExceptionClass(), equalTo(matcher.getExceptionClass()));
+        assertThat(errInfo.getErrorMsg(), equalTo(matcher.getErrorMsg()));
+        assertThat(errInfo.getErrorInfo(), equalTo(matcher.getErrorInfo()));
+    }
+
+    private static Entity<SocialContact> wrapIntoEntity(SocialContact sc){
+        return Entity.entity(sc, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    private static void verifyHeaderValue(Response response, String header, String expectedValue){
+        MultivaluedMap<String,Object> headers = response.getHeaders();
+        String location = (String)headers.getFirst(header);
+        assertThat(location, equalTo(expectedValue));
     }
 
     public static class TestBinder extends AbstractBinder{

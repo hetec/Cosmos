@@ -65,8 +65,7 @@ public class SocialContactResource{
     @PUT
     @Path("{id}")
     public Response updateContact(SocialContact socialContact,
-                                  @PathParam("id") Long id,
-                                  @Context UriInfo uriInfo){
+                                  @PathParam("id") Long id){
         socialContact.setId(id);
         SocialContact updatedContact = socialContactCrudService.update(socialContact);
         return Response

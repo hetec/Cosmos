@@ -3,6 +3,7 @@ package org.pode.cosmos.domain;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by patrick on 19.02.16.
@@ -22,11 +23,20 @@ public class SocialContact implements Serializable{
 
     private String lastName;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date birthdate;
+
     public SocialContact(){}
 
-    public SocialContact(String firstName, String lastName) {
+    public SocialContact(String firstName, String lastName, Date birthdate) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.birthdate = birthdate;
+        //Address
+        //Traits
+        //Type
+        //relations
+        //notes
     }
 
     public Long getId() {
@@ -51,5 +61,13 @@ public class SocialContact implements Serializable{
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Date getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(Date birthdate) {
+        this.birthdate = birthdate;
     }
 }

@@ -24,6 +24,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -263,13 +264,13 @@ public class SocialContactResourceTest extends JerseyTest{
 
     //Helper
     private static SocialContact createTestContact(){
-        SocialContact sc = new SocialContact("John", "Doe");
+        SocialContact sc = new SocialContact("John", "Doe", new Date());
         sc.setId(1L);
         return sc;
     }
 
     private static SocialContact createTestContact(final Long id, String first, String last){
-        SocialContact sc = new SocialContact(first, last);
+        SocialContact sc = new SocialContact(first, last, new Date());
         sc.setId(id);
         return sc;
     }

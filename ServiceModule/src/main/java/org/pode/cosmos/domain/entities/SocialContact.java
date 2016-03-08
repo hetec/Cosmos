@@ -1,9 +1,13 @@
-package org.pode.cosmos.domain;
+package org.pode.cosmos.domain.entities;
+
+
+import org.pode.cosmos.domain.utils.jaxbAdapter.LocalDateAdapter;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Created by patrick on 19.02.16.
@@ -24,19 +28,15 @@ public class SocialContact implements Serializable{
     private String lastName;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date birthdate;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate birthday;
 
     public SocialContact(){}
 
-    public SocialContact(String firstName, String lastName, Date birthdate) {
+    public SocialContact(String firstName, String lastName, LocalDate birthday) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.birthdate = birthdate;
-        //Address
-        //Traits
-        //Type
-        //relations
-        //notes
+        this.birthday = birthday;
     }
 
     public Long getId() {
@@ -63,11 +63,21 @@ public class SocialContact implements Serializable{
         this.lastName = lastName;
     }
 
-    public Date getBirthdate() {
-        return birthdate;
+    public LocalDate getBirthday() {
+        return birthday;
     }
 
-    public void setBirthdate(Date birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    @Override
+    public String toString() {
+        return "SocialContact{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthdate=" + birthday +
+                '}';
     }
 }

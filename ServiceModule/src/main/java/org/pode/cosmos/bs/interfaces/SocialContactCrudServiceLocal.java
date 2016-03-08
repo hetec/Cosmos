@@ -1,6 +1,6 @@
 package org.pode.cosmos.bs.interfaces;
 
-import org.pode.cosmos.domain.SocialContact;
+import org.pode.cosmos.domain.entities.SocialContact;
 
 import javax.ejb.Local;
 import java.util.List;

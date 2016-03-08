@@ -1,18 +1,15 @@
 package org.pode.cosmos.resources;
 
-import com.sun.org.apache.xerces.internal.util.Status;
-import com.sun.xml.internal.ws.server.UnsupportedMediaException;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.util.server.ContainerRequestBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
-import org.pode.cosmos.domain.SocialContact;
+import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 import org.pode.cosmos.exceptions.handler.GenericExceptionMapper;
 import org.pode.cosmos.exceptions.handler.NoSuchEntityForIdMapper;
@@ -20,17 +17,16 @@ import org.pode.cosmos.exceptions.handler.NotSupportedMediaTypeMapper;
 import org.pode.cosmos.exceptions.model.ExceptionInfo;
 
 import javax.ws.rs.NotSupportedException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by patrick on 24.02.16.
@@ -117,11 +113,12 @@ public class SocialContactResourceTest extends JerseyTest{
     @Test
     public void getContactById_idOne_validSocialContactObject(){
         SocialContact contact = createTestContact();
+        SocialContact matcher = createTestContact();
         when(service.findById(1L)).thenReturn(contact);
 
         Response response = target("/contacts/1").request().get(Response.class);
 
-        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
+        verifySocialContactProperties(response, matcher);
     }
 
     @Test
@@ -168,18 +165,6 @@ public class SocialContactResourceTest extends JerseyTest{
     }
 
     @Test
-    public void saveContact_noObjectAsBody_ExceptionInfo(){
-        ExceptionInfo ei = new ExceptionInfo(
-                WebApplicationException.class.getName(),
-                "HTTP 400 Bad Request",
-                "Unexpected"
-        );
-        Response response = target("/contacts").request().post(wrapIntoEntity(null));
-
-        verifyExceptionInfo(response, ei);
-    }
-
-    @Test
     public void updateContact_validEntityAsBody_StatusCodeOK(){
         SocialContact sc = createTestContact();
         when(service.update(any(SocialContact.class))).thenReturn(sc);
@@ -202,11 +187,12 @@ public class SocialContactResourceTest extends JerseyTest{
     @Test
     public void updateContact_validEntityAsBody_ValidSocialContact(){
         SocialContact sc = createTestContact();
+        SocialContact matcher = createTestContact();
         when(service.update(any(SocialContact.class))).thenReturn(sc);
 
         Response response = target("/contacts/1").request().put(wrapIntoEntity(sc));
 
-        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
+        verifySocialContactProperties(response, matcher);
     }
 
     @Test
@@ -241,11 +227,12 @@ public class SocialContactResourceTest extends JerseyTest{
     @Test
     public void deleteContact_noProblems_deletedSocialContact(){
         SocialContact sc = createTestContact();
+        SocialContact matcher = createTestContact();
         when(service.delete(1L)).thenReturn(sc);
 
         Response response = target("/contacts/1").request().delete();
 
-        verifySocialContactProperties(response, createTestContact(1L, "John", "Doe"));
+        verifySocialContactProperties(response, matcher);
     }
 
     @Test
@@ -264,13 +251,18 @@ public class SocialContactResourceTest extends JerseyTest{
 
     //Helper
     private static SocialContact createTestContact(){
-        SocialContact sc = new SocialContact("John", "Doe", new Date());
+        LocalDate d = LocalDate.of(2015, 12, 12);
+
+        SocialContact sc = new SocialContact(
+                "John",
+                "Doe",
+                d);
         sc.setId(1L);
         return sc;
     }
 
-    private static SocialContact createTestContact(final Long id, String first, String last){
-        SocialContact sc = new SocialContact(first, last, new Date());
+    private static SocialContact createTestContact(final Long id, String first, String last, LocalDate d){
+        SocialContact sc = new SocialContact(first, last, d);
         sc.setId(id);
         return sc;
     }

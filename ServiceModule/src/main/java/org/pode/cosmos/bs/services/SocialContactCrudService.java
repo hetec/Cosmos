@@ -2,7 +2,7 @@ package org.pode.cosmos.bs.services;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
-import org.pode.cosmos.domain.SocialContact;
+import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 
 import javax.ejb.Stateless;

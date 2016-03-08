@@ -3,6 +3,7 @@ package org.pode.cosmos.bs.services;
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.domain.entities.SocialContact;
+import org.pode.cosmos.domain.entities.Traits;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 
 import javax.ejb.Stateless;
@@ -52,7 +53,11 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
 
     @Override
     public SocialContact save(SocialContact socialContact) {
+        Traits t = new Traits();
+        t.setTitle("TEST Trait");
+        socialContact.addTrait(t);
         em.persist(socialContact);
+        em.persist(t);
         return socialContact;
     }
 

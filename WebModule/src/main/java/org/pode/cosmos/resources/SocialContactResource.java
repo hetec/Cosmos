@@ -2,7 +2,8 @@ package org.pode.cosmos.resources;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.bs.services.SocialContactCrudService;
-import org.pode.cosmos.domain.SocialContact;
+import org.pode.cosmos.domain.entities.SocialContact;
+import org.pode.cosmos.domain.entities.Traits;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

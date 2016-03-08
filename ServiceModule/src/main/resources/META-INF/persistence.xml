@@ -3,7 +3,7 @@
     <persistence-unit name="cosmos" transaction-type="JTA">
         <description>Persistence provider for the cosmos app</description>
         <jta-data-source>
-            jdbc/__derbyPool
+            jdbc/__default
         </jta-data-source>
         <properties>
             <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>

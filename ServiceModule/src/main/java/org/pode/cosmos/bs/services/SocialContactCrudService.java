@@ -19,9 +19,9 @@ import java.util.Objects;
 @Stateless
 public class SocialContactCrudService implements SocialContactCrudServiceLocal {
 
-    private static final String ERROR_MSG_DELETE = "The entity you want to delete does not exist";
-    private static final String ERROR_MSG_UPDATE = "The entity you want to update does not exist";
-    private static final String ERROR_MSG_FIND = "The entity for the requested id does not exist";
+    private static final String ERROR_MSG_DELETE = "The social contact you want to delete does not exist";
+    private static final String ERROR_MSG_UPDATE = "The social contact you want to update does not exist";
+    private static final String ERROR_MSG_FIND = "The social contact for the requested id does not exist";
 
     private EntityManager em;
 
@@ -33,7 +33,7 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
     }
 
     @Override
-    public SocialContact findById(Long id) {
+    public SocialContact findById(Long id) throws NoSuchEntityForIdException{
         SocialContact result = em.find(SocialContact.class, id);
         if(!Objects.nonNull(result)){
             throw new NoSuchEntityForIdException(id, ERROR_MSG_FIND);
@@ -53,17 +53,14 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
 
     @Override
     public SocialContact save(SocialContact socialContact) {
-        Traits t = new Traits();
-        t.setTitle("TEST Trait");
-        socialContact.addTrait(t);
         em.persist(socialContact);
-        em.persist(t);
         return socialContact;
     }
 
     @Override
     public SocialContact update(SocialContact socialContact) {
-        if(em.find(SocialContact.class, socialContact.getId()) == null){
+        SocialContact existingContact = em.find(SocialContact.class, socialContact.getId());
+        if(existingContact == null){
             throw new NoSuchEntityForIdException(socialContact.getId(), ERROR_MSG_UPDATE);
         }
         return em.merge(socialContact);

@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
+import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
 import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 import org.pode.cosmos.exceptions.handler.GenericExceptionMapper;
@@ -36,6 +37,9 @@ public class SocialContactResourceTest extends JerseyTest{
 
     @Mock
     private static SocialContactCrudServiceLocal service;
+
+    @Mock
+    private static TraitCrudServiceLocal traitService;
 
     @Override
     protected Application configure() {
@@ -305,9 +309,11 @@ public class SocialContactResourceTest extends JerseyTest{
         @Override
         protected void configure() {
             bindFactory(ServiceProvider.class).to(SocialContactCrudServiceLocal.class);
+            bindFactory(TraitServiceProvider.class).to(TraitCrudServiceLocal.class);
         }
     }
 
+    //Provide social contact service
     public static class ServiceProvider implements Factory<SocialContactCrudServiceLocal>{
         @Override
         public SocialContactCrudServiceLocal provide() {
@@ -316,6 +322,18 @@ public class SocialContactResourceTest extends JerseyTest{
 
         @Override
         public void dispose(SocialContactCrudServiceLocal instance) {
+        }
+    }
+
+    //provide trait service
+    public static class TraitServiceProvider implements Factory<TraitCrudServiceLocal>{
+        @Override
+        public TraitCrudServiceLocal provide() {
+            return traitService;
+        }
+
+        @Override
+        public void dispose(TraitCrudServiceLocal instance) {
         }
     }
 }

@@ -4,19 +4,20 @@ package org.pode.cosmos.domain.entities;
 import org.pode.cosmos.domain.utils.jaxbAdapter.LocalDateAdapter;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by patrick on 19.02.16.
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @NamedQueries({
         @NamedQuery(name = "socialContact.findAll",
@@ -35,10 +36,15 @@ public class SocialContact implements Serializable{
     @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate birthday;
 
-    @OneToMany(mappedBy = "contact")
-    private List<Traits> traits;
+    @OneToMany(
+            mappedBy = "contact",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @XmlTransient
+    private Set<Traits> traits;
 
-    public SocialContact(){}
+    public SocialContact(){
+    }
 
     public SocialContact(String firstName, String lastName, LocalDate birthday) {
         this.firstName = firstName;
@@ -59,7 +65,7 @@ public class SocialContact implements Serializable{
         }
         //Initialize with empty list if null
         if(Objects.isNull(traits)){
-            this.traits = new ArrayList<>();
+            this.traits = new HashSet<>();
         }
         trait.setContact(this);
         this.traits.add(trait);
@@ -116,12 +122,12 @@ public class SocialContact implements Serializable{
         this.birthday = birthday;
     }
 
-    public List<Traits> getTraits() {
-        return traits;
+    public void setTraits(Set<Traits> traits) {
+        this.traits = traits;
     }
 
-    public void setTraits(List<Traits> traits) {
-        this.traits = traits;
+    public Set<Traits> getTraits() {
+        return traits;
     }
 
     @Override

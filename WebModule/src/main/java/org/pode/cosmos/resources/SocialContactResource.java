@@ -1,10 +1,12 @@
 package org.pode.cosmos.resources;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
+import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
 import org.pode.cosmos.bs.services.SocialContactCrudService;
 import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.entities.Traits;
 
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -21,11 +23,15 @@ import java.util.List;
 @Consumes("application/json")
 public class SocialContactResource{
 
-    SocialContactCrudServiceLocal socialContactCrudService;
+    private SocialContactCrudServiceLocal socialContactCrudService;
+    private TraitCrudServiceLocal traitService;
 
     @Inject
-    public SocialContactResource(SocialContactCrudServiceLocal socialContactCrudService){
+    public SocialContactResource(
+            SocialContactCrudServiceLocal socialContactCrudService,
+            TraitCrudServiceLocal traitService){
         this.socialContactCrudService = socialContactCrudService;
+        this.traitService = traitService;
     }
 
     public SocialContactResource(){}
@@ -84,6 +90,11 @@ public class SocialContactResource{
                 .ok(removedContact)
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();
+    }
+
+    @Path("{id}/traits")
+    public TraitResource manageTraits(@PathParam("id") Long contactId){
+        return new TraitResource(traitService, contactId);
     }
 
 }

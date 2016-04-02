@@ -11,13 +11,10 @@ import javax.validation.constraints.Size;
  */
 public class RegistrationData {
 
-    @Pattern(regexp = "[a-zA-Z]{5,20}")
     private String username;
 
-    //Add password pattern
     private String password;
 
-    //Add email pattern
     private String email;
 
     public String getUsername() {

@@ -1,5 +1,6 @@
 package org.pode.cosmos.bs.services;
 
+import org.pode.cosmos.auth.Authenticator;
 import org.pode.cosmos.bs.interfaces.RegistrationServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.domain.auth.RegistrationData;
@@ -19,16 +20,27 @@ import javax.persistence.EntityManager;
 public class RegistrationService implements RegistrationServiceLocal{
 
     private EntityManager em;
+    private Authenticator authenticator;
 
     @Inject
-    RegistrationService(@CosmosCtx EntityManager em){
+    RegistrationService(@CosmosCtx EntityManager em,
+                        Authenticator authenticator){
         this.em = em;
+        this.authenticator = authenticator;
     }
 
     public RegistrationService(){}
 
     @Override
     public UserProfile registerUserProfile(RegistrationData registrationData) {
+        try {
+            registrationData.setPassword(
+                    authenticator.createPwHash(
+                            registrationData.getPassword()
+                    ));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         UserProfile profile = new UserProfile(registrationData);
         em.persist(profile);
         return profile;

@@ -2,10 +2,10 @@ package org.pode.cosmos.domain.entities;
 
 import org.pode.cosmos.domain.auth.RegistrationData;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.registry.infomodel.User;
 import java.io.Serializable;
@@ -20,10 +20,18 @@ public class UserProfile implements Serializable{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 20, nullable = false, unique = true)
+    @Pattern(regexp = "[a-zA-Z]{5,20}")
     private String username;
 
+    @Column(length = 50, nullable = false)
+    @NotNull
+    @Size(min = 8, max = 50)
     private String password;
 
+    @Column(length = 50, nullable = false)
+    @NotNull
+    @Size(min = 6)
     private String email;
 
     public UserProfile(){

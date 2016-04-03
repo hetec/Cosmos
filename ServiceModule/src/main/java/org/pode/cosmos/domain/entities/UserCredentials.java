@@ -1,21 +1,27 @@
 package org.pode.cosmos.domain.entities;
 
-import org.pode.cosmos.domain.auth.RegistrationData;
+import org.pode.cosmos.domain.auth.Credentials;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.registry.infomodel.User;
 import java.io.Serializable;
 
 /**
- * Created by patrick on 02.04.16.
+ * Holds the users credentials
+ *
+ * @author Patrick Hebner
  */
-@Entity
 @XmlRootElement
-public class UserProfile implements Serializable{
+@Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "userCredentials.findByUserName",
+                query = "SELECT u FROM UserCredentials u WHERE u.username = :username")
+})
+public class UserCredentials implements Serializable{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,18 +40,18 @@ public class UserProfile implements Serializable{
     @Size(min = 6)
     private String email;
 
-    public UserProfile(){
+    public UserCredentials(){
     }
 
     /**
      * Convenience constructor for creating a new profile during a registration process
      *
-     * @param registrationData Data necessary for registering a new user
+     * @param credentials Data necessary for registering a new user
      */
-    public UserProfile(RegistrationData registrationData){
-        this.username = registrationData.getUsername();
-        this.password = registrationData.getPassword();
-        this.email = registrationData.getEmail();
+    public UserCredentials(Credentials credentials){
+        this.username = credentials.getUsername();
+        this.password = credentials.getPassword();
+        this.email = credentials.getEmail();
     }
 
     public Long getId() {

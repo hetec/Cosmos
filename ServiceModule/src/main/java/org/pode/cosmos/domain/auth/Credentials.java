@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
  *
  * Provides information necessary to register a user to the application
  */
-public class RegistrationData {
+public class Credentials {
 
     private String username;
 

@@ -39,10 +39,13 @@ public class AuthService implements AuthServiceLocal {
     @Override
     public UserCredentials registerUser(Credentials credentials) {
         credentials.setPassword(
-                authenticator.createPwHash(
+                authenticator.hash(
                         credentials.getPassword()
                 ));
-        UserCredentials profile = new UserCredentials(credentials);
+        UserCredentials profile = new UserCredentials();
+        profile.setUsername(credentials.getUsername());
+        profile.setPassword(credentials.getPassword());
+        profile.setEmail(credentials.getEmail());
         em.persist(profile);
         return profile;
     }

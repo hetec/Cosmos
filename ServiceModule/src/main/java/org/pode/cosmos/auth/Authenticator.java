@@ -5,13 +5,14 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Base64;
 import java.util.Random;
 
 /**
- * Created by patrick on 02.04.16.
+ * Handles user authentication issues like password hashing
+ * @author Patrick Hebner
  */
 @RequestScoped
 @Named
@@ -22,36 +23,53 @@ public class Authenticator {
     final static int KEY_LEN = 256;
     final static String ALGO = "PBKDF2WithHmacSHA512";
 
-    public String createPwHash(String password){
-        System.out.println("Create hash");
-        byte[] salt = new byte[SALT_LEN];
-        new Random().nextBytes(salt);
+    /**
+     * Creates a salted password hash with the PBKDF2 algorithm
+     * @param password The password which should be hashed
+     * @return The created password hash
+     */
+    public String hash(String password){
+        return createPwHash(password, buildSalt());
+    }
+
+    private String createPwHash(final String password, byte[] salt){
         byte[] hash = null;
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LEN);
         try {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGO);
             hash = keyFactory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException algoEx){
-            System.out.println("No such algorithm!");
             algoEx.printStackTrace();
-            //Do loggin here
+            //This should never happen
         } catch (InvalidKeySpecException specEx) {
-            System.out.println("Wrong key spec!");
             specEx.printStackTrace();
-            //Do loggin here
+            //This should never happen
         }
-        return salt.toString() + "$" + hash.toString();
+        Base64.Encoder enc = Base64.getEncoder();
+        String saltAndHash = enc.encodeToString(salt) + "$" + enc.encodeToString(hash);
+        return saltAndHash;
     }
 
-    public boolean checkCredentials(String requestedPw, String storedPwHash){
-        System.out.println("requested: " + requestedPw);
-        System.out.println("stored: " + storedPwHash);
-        return extractPw(storedPwHash).equals(extractPw(createPwHash(requestedPw)));
-
+    private byte[] buildSalt(){
+        byte[] salt = new byte[SALT_LEN];
+        new Random().nextBytes(salt);
+        return salt;
     }
 
-    private String extractPw (String storedHash){
-        return storedHash.split("$")[1];
+    public boolean checkCredentials(final String requestedPw, final String storedSaltAndHash){
+        // Get the stored salt from the hash
+        String storedSalt = extractSalt(storedSaltAndHash);
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] saltBytes = decoder.decode(storedSalt);
+        // Hash the new password with the stored salt
+        String requestedSaltAndHash = createPwHash(requestedPw, saltBytes);
+        // If both hashes are equal also the passwords is valid
+        return storedSaltAndHash.equals(requestedSaltAndHash);
+    }
+
+    private String extractSalt (final String storedHash){
+        String[]pw = storedHash.split("\\$");
+        return pw[0];
     }
 
 }

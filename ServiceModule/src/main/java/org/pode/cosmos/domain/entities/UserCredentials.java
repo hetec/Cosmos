@@ -30,9 +30,7 @@ public class UserCredentials implements Serializable{
     @Pattern(regexp = "[a-zA-Z]{5,20}")
     private String username;
 
-    @Column(length = 50, nullable = false)
     @NotNull
-    @Size(min = 8, max = 50)
     private String password;
 
     @Column(length = 50, nullable = false)

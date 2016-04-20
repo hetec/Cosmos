@@ -5,6 +5,7 @@ import sun.misc.BASE64Encoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.NotAuthorizedException;
 import javax.xml.bind.DatatypeConverter;
@@ -20,26 +21,30 @@ import java.util.Objects;
 public class JwtGenerator {
 
     SignatureAlgorithm ALGO = SignatureAlgorithm.HS512;
-    String KEY = "TEST";
+
+    private ApiKey apiKey;
+
+    @Inject
+    public JwtGenerator(ApiKey apiKey){
+        this.apiKey = apiKey;
+    }
 
     public String createJwt(final String subject,
                             final String issuer,
                             final long timeToLiveMs){
 
-        String jwt = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(subject)
                 .setIssuer(issuer)
-                .signWith(ALGO, KEY)
+                .signWith(ALGO, apiKey.getSecret())
                 .compact();
-
-        return jwt;
     }
 
     public String verifyJwt(final String jwt){
-        Claims claims = null;
+        Claims claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(KEY)
+                    .setSigningKey(apiKey.getSecret())
                     .parseClaimsJws(jwt)
                     .getBody();
             if(Objects.isNull(claims)){

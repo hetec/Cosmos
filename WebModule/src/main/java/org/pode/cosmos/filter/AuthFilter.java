@@ -37,7 +37,7 @@ public class AuthFilter implements ContainerRequestFilter{
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(final ContainerRequestContext requestContext) throws IOException {
         // Get authorization header
         final String authHeader = requestContext.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if(!authHeader.startsWith(PREFIX)){
@@ -67,7 +67,7 @@ public class AuthFilter implements ContainerRequestFilter{
         return authString.split(SEPARATOR);
     }
 
-    private void abortProcess(ContainerRequestContext requestContext, String reason){
+    private void abortProcess(final ContainerRequestContext requestContext, final String reason){
         requestContext.abortWith(Response
                 .status(Response.Status.UNAUTHORIZED)
                 .entity(new ExceptionInfo(

@@ -19,9 +19,9 @@ import java.io.Serializable;
 @NamedQueries({
         @NamedQuery(
                 name = "userCredentials.findByUserName",
-                query = "SELECT u FROM UserCredentials u WHERE u.username = :username")
+                query = "SELECT u FROM UserProfile u WHERE u.username = :username")
 })
-public class UserCredentials implements Serializable{
+public class UserProfile implements Serializable{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,7 +38,7 @@ public class UserCredentials implements Serializable{
     @Size(min = 6)
     private String email;
 
-    public UserCredentials(){
+    public UserProfile(){
     }
 
     /**
@@ -46,7 +46,7 @@ public class UserCredentials implements Serializable{
      *
      * @param credentials Data necessary for registering a new user
      */
-    public UserCredentials(Credentials credentials){
+    public UserProfile(Credentials credentials){
         this.username = credentials.getUsername();
         this.password = credentials.getPassword();
         this.email = credentials.getEmail();

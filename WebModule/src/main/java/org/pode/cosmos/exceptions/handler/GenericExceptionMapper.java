@@ -10,7 +10,7 @@ import javax.ws.rs.ext.Provider;
 /**
  * Created by patrick on 23.02.16.
  */
-//@Provider
+@Provider
 public class GenericExceptionMapper implements ExceptionMapper<Throwable>{
 
     @Override

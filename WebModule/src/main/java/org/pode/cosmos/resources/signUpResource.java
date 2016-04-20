@@ -1,14 +1,12 @@
 package org.pode.cosmos.resources;
 
+import org.pode.cosmos.auth.JwtGenerator;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.domain.auth.Credentials;
-import org.pode.cosmos.domain.entities.UserCredentials;
+import org.pode.cosmos.domain.entities.UserProfile;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -32,10 +30,12 @@ public class signUpResource {
 
     @POST
     public Response registerUser(Credentials credentials, @Context UriInfo uriInfo){
-        UserCredentials profile = authService.registerUser(credentials);
+        UserProfile profile = authService.registerUser(credentials);
+        JwtGenerator jwtGenerator = new JwtGenerator();
 
         URI uri = uriInfo.getBaseUriBuilder().path(ProfileResource.class).path(profile.getId().toString()).build();
-        return Response.created(uri).type(MediaType.APPLICATION_JSON_TYPE).build();
+        String token = jwtGenerator.createJwt(uri.toString(), "cosmos", 50000L);
+        return Response.created(uri).type(MediaType.APPLICATION_JSON_TYPE).header("X-Auth", token).build();
     }
 
 }

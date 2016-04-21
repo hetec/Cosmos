@@ -14,8 +14,10 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Objects;
 
 /**
@@ -63,7 +65,29 @@ public class AuthFilter implements ContainerRequestFilter{
             } else {
                 // Verify the token
                 try{
-                    jwtGenerator.verifyJwt(token);
+                    final String subject = jwtGenerator.verifyJwt(token);
+
+                    requestContext.setSecurityContext(new SecurityContext() {
+                        @Override
+                        public Principal getUserPrincipal() {
+                            return () -> subject;
+                        }
+
+                        @Override
+                        public boolean isUserInRole(String role) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean isSecure() {
+                            return false;
+                        }
+
+                        @Override
+                        public String getAuthenticationScheme() {
+                            return null;
+                        }
+                    });
                 } catch (JwtException jwtEx){
                     abortProcess(requestContext, buildDefaultResponse(jwtEx.getMessage()));
                 }

@@ -12,10 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.io.IOException;
 
 /**
@@ -33,9 +30,16 @@ public class signInResource {
     }
 
     @POST
-    public Response signIn(Credentials credentials, @HeaderParam("X-Auth") String auth, @Context UriInfo uriInfo) throws IOException {
+    public Response signIn(Credentials credentials, @Context UriInfo uriInfo) throws IOException {
         String jwt = authService.loginUser(credentials);
         return Response.ok().header(HttpHeaders.AUTHORIZATION, jwt).build();
+    }
+
+    @GET
+    @Secured
+    public Response getTest(@Context SecurityContext securityContext){
+        String user = securityContext.getUserPrincipal().getName();
+        return Response.ok("TEST AUTH: " + user).build();
     }
 
 

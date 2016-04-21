@@ -38,10 +38,5 @@ public class signInResource {
         return Response.ok().header(HttpHeaders.AUTHORIZATION, jwt).build();
     }
 
-    @GET
-    @Secured
-    public Response test(){
-        return Response.ok("TEST ATUH").build();
-    }
 
 }

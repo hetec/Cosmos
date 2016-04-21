@@ -1,7 +1,6 @@
 package org.pode.cosmos.auth;
 
 import io.jsonwebtoken.SignatureAlgorithm;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.RequestScoped;
@@ -27,8 +26,9 @@ public class ApiKey {
 
     /**
      * Loads the secret api key from the configuration file
+     *
      * @return Api key
-     * @throws IOException
+     * @throws IllegalStateException if the api file cannot be loaded
      */
     private void loadSecret() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -37,12 +37,13 @@ public class ApiKey {
             keyProperties.load(inputStream);
             secret = keyProperties.getProperty(KEY);
         }catch (final IOException ioEx){
-            throw new InvalidStateException("Cannot load api key from " + API_KEY_FILE);
+            throw new IllegalStateException("Cannot load api key from " + API_KEY_FILE);
         }
     }
 
     /**
      * Provides the secret api key
+     *
      * @return Api key
      */
     public String getSecret(){

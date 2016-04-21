@@ -25,7 +25,7 @@ import javax.ws.rs.NotAuthorizedException;
 public class AuthService implements AuthServiceLocal {
 
     private final static String USERNAME_PARAM = "username";
-    private final static long TIME_TO_LIVE_JWT = 24 * 60 * 60 * 1000; // 1 day
+    private final static long TIME_TO_LIVE_JWT = 1000 * 60; // 1 min
 
     private EntityManager em;
     private Authenticator authenticator;

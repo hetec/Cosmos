@@ -22,20 +22,20 @@ import java.net.URI;
 public class signUpResource {
 
     private AuthServiceLocal authService;
+    private JwtGenerator jwtGenerator;
 
     @Inject
-    public signUpResource(AuthServiceLocal authService){
+    public signUpResource(AuthServiceLocal authService,
+                          JwtGenerator jwtGenerator){
         this.authService = authService;
+        this.jwtGenerator = jwtGenerator;
     }
 
     @POST
     public Response registerUser(Credentials credentials, @Context UriInfo uriInfo){
         UserProfile profile = authService.registerUser(credentials);
-        JwtGenerator jwtGenerator = new JwtGenerator();
-
         URI uri = uriInfo.getBaseUriBuilder().path(ProfileResource.class).path(profile.getId().toString()).build();
-        String token = jwtGenerator.createJwt(uri.toString(), "cosmos", 50000L);
-        return Response.created(uri).type(MediaType.APPLICATION_JSON_TYPE).header("X-Auth", token).build();
+        return Response.created(uri).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
 }

@@ -1,5 +1,7 @@
 package org.pode.cosmos.domain.auth;
 
+import org.pode.cosmos.domain.validators.Email;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;

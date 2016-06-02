@@ -1,4 +1,4 @@
-package org.pode.cosmos.exceptions.handler;
+package org.pode.cosmos.exceptionHandling.handler;
 
 import org.pode.cosmos.domain.exceptions.NoSuchAccountException;
 

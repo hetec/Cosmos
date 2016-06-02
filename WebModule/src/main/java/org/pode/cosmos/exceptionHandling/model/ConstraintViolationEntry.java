@@ -1,10 +1,5 @@
-package org.pode.cosmos.exceptions.model;
+package org.pode.cosmos.exceptionHandling.model;
 
-import javax.swing.text.StringContent;
-import javax.validation.ConstraintViolation;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package org.pode.cosmos.auth;
+package org.pode.cosmos.security;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

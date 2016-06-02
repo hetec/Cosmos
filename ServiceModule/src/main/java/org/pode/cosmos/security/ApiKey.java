@@ -1,15 +1,9 @@
-package org.pode.cosmos.auth;
+package org.pode.cosmos.security;
 
-import io.jsonwebtoken.SignatureAlgorithm;
-
-import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Key;
-import java.security.Signature;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**

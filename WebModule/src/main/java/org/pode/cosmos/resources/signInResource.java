@@ -1,15 +1,12 @@
 package org.pode.cosmos.resources;
 
-import org.pode.cosmos.annotations.Secured;
-import org.pode.cosmos.auth.ApiKey;
-import org.pode.cosmos.auth.JwtGenerator;
+import org.pode.cosmos.security.Secured;
+import org.pode.cosmos.security.JwtGenerator;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.domain.auth.Credentials;
 
 import javax.inject.Inject;
-import javax.mail.Header;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.*;

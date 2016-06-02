@@ -1,14 +1,9 @@
-package org.pode.cosmos.filter;
+package org.pode.cosmos.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import org.pode.cosmos.annotations.Secured;
-import org.pode.cosmos.auth.JwtGenerator;
-import org.pode.cosmos.exceptions.model.ExceptionInfo;
+import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
 import javax.inject.Inject;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;

@@ -1,7 +1,7 @@
 package org.pode.cosmos.bs.services;
 
-import org.pode.cosmos.auth.Authenticator;
-import org.pode.cosmos.auth.JwtGenerator;
+import org.pode.cosmos.security.Authenticator;
+import org.pode.cosmos.security.JwtGenerator;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.domain.auth.Credentials;

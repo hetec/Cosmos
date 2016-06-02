@@ -1,8 +1,6 @@
-package org.pode.cosmos.exceptions.handler;
+package org.pode.cosmos.exceptionHandling.handler;
 
-import org.pode.cosmos.domain.entities.SocialContact;
-import org.pode.cosmos.exceptions.model.ConstraintViolationEntry;
-import org.pode.cosmos.exceptions.model.ExceptionInfo;
+import org.pode.cosmos.exceptionHandling.model.ConstraintViolationEntry;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -18,7 +16,7 @@ import java.util.*;
  * Created by patrick on 28.05.16.
  */
 @Provider
-public class ValidationConstraintMapper implements ExceptionMapper<ConstraintViolationException>{
+public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViolationException>{
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {

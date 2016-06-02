@@ -1,4 +1,4 @@
-package org.pode.cosmos.auth;
+package org.pode.cosmos.security;
 
 import io.jsonwebtoken.*;
 import org.pode.cosmos.cdi.qualifiers.SystemZonedClock;

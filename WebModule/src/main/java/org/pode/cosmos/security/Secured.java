@@ -1,4 +1,4 @@
-package org.pode.cosmos.annotations;
+package org.pode.cosmos.security;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;

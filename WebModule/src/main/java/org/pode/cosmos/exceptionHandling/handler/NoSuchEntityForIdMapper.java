@@ -1,7 +1,7 @@
-package org.pode.cosmos.exceptions.handler;
+package org.pode.cosmos.exceptionHandling.handler;
 
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
-import org.pode.cosmos.exceptions.model.ExceptionInfo;
+import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

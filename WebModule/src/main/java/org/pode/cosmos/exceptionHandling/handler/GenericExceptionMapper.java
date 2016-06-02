@@ -1,11 +1,10 @@
-package org.pode.cosmos.exceptions.handler;
+package org.pode.cosmos.exceptionHandling.handler;
 
-import org.pode.cosmos.exceptions.model.ExceptionInfo;
+import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 /**
  * Created by patrick on 23.02.16.

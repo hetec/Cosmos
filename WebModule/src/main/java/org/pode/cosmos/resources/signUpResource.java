@@ -1,11 +1,16 @@
 package org.pode.cosmos.resources;
 
-import org.pode.cosmos.auth.JwtGenerator;
+import org.pode.cosmos.appconfig.DefaultLocale;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.domain.auth.Credentials;
 import org.pode.cosmos.domain.entities.UserProfile;
+import org.pode.cosmos.exceptionHandling.interceptors.ApiExceptionInterceptor;
+import org.pode.cosmos.exceptionHandling.model.ApiException;
+import org.pode.cosmos.exceptionHandling.model.ApiSocialContactError;
 
 import javax.inject.Inject;
+import javax.interceptor.Interceptor;
+import javax.interceptor.Interceptors;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -13,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.Locale;
 
 /**
  * Created by patrick on 02.04.16.
@@ -20,6 +26,7 @@ import java.net.URI;
 @Path("/signUp")
 @Consumes("application/json")
 @Produces("application/json")
+@Interceptors({ApiExceptionInterceptor.class})
 public class signUpResource {
 
     private AuthServiceLocal authService;
@@ -28,6 +35,10 @@ public class signUpResource {
     public signUpResource(AuthServiceLocal authService){
         this.authService = authService;
     }
+
+    @Inject
+    private @DefaultLocale
+    Locale locale;
 
     @POST
     public Response registerUser(@Valid Credentials credentials, @Context UriInfo uriInfo){

@@ -1,6 +1,7 @@
 package org.pode.cosmos.domain.exceptions;
 
 
+import org.pode.cosmos.domain.exceptions.errors.ApiError;
 import org.pode.cosmos.domain.exceptions.jaxbAdapters.ResponseStatusAdapter;
 
 import javax.ws.rs.core.Response;

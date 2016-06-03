@@ -4,9 +4,8 @@ import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
 import org.pode.cosmos.domain.entities.SocialContact;
-import org.pode.cosmos.domain.entities.Traits;
 import org.pode.cosmos.domain.exceptions.ApiException;
-import org.pode.cosmos.domain.exceptions.ApiSocialContactError;
+import org.pode.cosmos.domain.exceptions.errors.ApiSocialContactError;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 
 import javax.ejb.Stateless;
@@ -35,7 +34,7 @@ public class SocialContactCrudService implements SocialContactCrudServiceLocal {
     }
 
     @Override
-    public SocialContact findById(Long id) throws NoSuchEntityForIdException{
+    public SocialContact findById(Long id){
         SocialContact result = em.find(SocialContact.class, id);
         if(!Objects.nonNull(result)){
             throw new ApiException(ApiSocialContactError.SC10001, locale);

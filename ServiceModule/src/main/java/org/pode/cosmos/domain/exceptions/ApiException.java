@@ -1,5 +1,7 @@
 package org.pode.cosmos.domain.exceptions;
 
+import org.pode.cosmos.domain.exceptions.errors.ApiError;
+
 import javax.ws.rs.core.Response;
 import java.util.Locale;
 

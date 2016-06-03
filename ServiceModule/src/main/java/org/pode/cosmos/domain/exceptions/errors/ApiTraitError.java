@@ -1,22 +1,24 @@
-package org.pode.cosmos.domain.exceptions;
+package org.pode.cosmos.domain.exceptions.errors;
 
 import javax.ws.rs.core.Response;
 
 /**
- * Created by patrick on 01.06.16.
+ * Created by patrick on 03.06.16.
  */
-public enum ApiSocialContactError implements ApiError{
+public enum ApiTraitError implements ApiError {
 
-    SC10001(Response.Status.BAD_REQUEST, "social_contact_not_found");
+    T10001(Response.Status.BAD_REQUEST, "trait_not_found_for_id"),
+    T10002(Response.Status.CONFLICT, "invalid_social_contact_id_for_trait");
 
     private Response.Status status;
     private String messageKey;
 
-    ApiSocialContactError(Response.Status status, String messageKey) {
+    ApiTraitError(
+            final Response.Status status,
+            final String messageKey) {
         this.status = status;
         this.messageKey = messageKey;
     }
-
 
     @Override
     public Response.Status getStatus() {

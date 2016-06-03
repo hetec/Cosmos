@@ -1,4 +1,4 @@
-package org.pode.cosmos.domain.exceptions;
+package org.pode.cosmos.domain.exceptions.errors;
 
 import javax.ws.rs.core.Response;
 

@@ -1,4 +1,4 @@
-package org.pode.cosmos.exceptionHandling.model;
+package org.pode.cosmos.domain.exceptions;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;

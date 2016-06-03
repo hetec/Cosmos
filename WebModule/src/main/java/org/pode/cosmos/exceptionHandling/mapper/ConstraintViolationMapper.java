@@ -1,6 +1,6 @@
-package org.pode.cosmos.exceptionHandling.handler;
+package org.pode.cosmos.exceptionHandling.mapper;
 
-import org.pode.cosmos.exceptionHandling.model.ConstraintViolationEntry;
+import org.pode.cosmos.domain.exceptions.ConstraintViolationEntry;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;

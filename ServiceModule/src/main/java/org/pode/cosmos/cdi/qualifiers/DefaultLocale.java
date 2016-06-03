@@ -1,4 +1,4 @@
-package org.pode.cosmos.appconfig;
+package org.pode.cosmos.cdi.qualifiers;
 
 import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;

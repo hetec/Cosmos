@@ -1,27 +1,30 @@
-package org.pode.cosmos.exceptionHandling.handler;
+package org.pode.cosmos.exceptionHandling.mapper;
 
 import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 /**
- * Created by patrick on 23.02.16.
+ * Created by patrick on 20.04.16.
  */
-//@Provider
-public class GenericExceptionMapper implements ExceptionMapper<Throwable>{
+@Provider
+public class NotAuthorizedMapper implements ExceptionMapper<NotAuthorizedException>{
 
     @Override
-    public Response toResponse(Throwable exception) {
+    public Response toResponse(NotAuthorizedException exception) {
         ExceptionInfo info = new ExceptionInfo(
                 exception.getClass().getName(),
                 exception.getMessage(),
-                "Unexpected");
+                "use -> 'BEARER token' in the authorization header");
         return Response
-                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .status(Response.Status.UNAUTHORIZED)
                 .entity(info)
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();
     }
+
 }

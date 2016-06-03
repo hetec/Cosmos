@@ -1,4 +1,4 @@
-package org.pode.cosmos.exceptionHandling.handler;
+package org.pode.cosmos.exceptionHandling.mapper;
 
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;

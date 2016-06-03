@@ -1,6 +1,7 @@
-package org.pode.cosmos.exceptionHandling.model;
+package org.pode.cosmos.domain.exceptions;
 
-import org.pode.cosmos.exceptionHandling.model.jaxbAdapters.ResponseStatusAdapter;
+
+import org.pode.cosmos.domain.exceptions.jaxbAdapters.ResponseStatusAdapter;
 
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlAccessType;

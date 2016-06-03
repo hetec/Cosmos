@@ -1,4 +1,4 @@
-package org.pode.cosmos.exceptionHandling.model;
+package org.pode.cosmos.domain.exceptions;
 
 import javax.ws.rs.core.Response;
 import java.util.Locale;

@@ -1,15 +1,12 @@
 package org.pode.cosmos.resources;
 
-import org.pode.cosmos.appconfig.DefaultLocale;
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.domain.auth.Credentials;
 import org.pode.cosmos.domain.entities.UserProfile;
 import org.pode.cosmos.exceptionHandling.interceptors.ApiExceptionInterceptor;
-import org.pode.cosmos.exceptionHandling.model.ApiException;
-import org.pode.cosmos.exceptionHandling.model.ApiSocialContactError;
 
 import javax.inject.Inject;
-import javax.interceptor.Interceptor;
 import javax.interceptor.Interceptors;
 import javax.validation.Valid;
 import javax.ws.rs.*;

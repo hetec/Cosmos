@@ -1,7 +1,8 @@
-package org.pode.cosmos.appconfig;
+package org.pode.cosmos.cdi.producers;
+
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import java.util.Locale;
 
@@ -13,7 +14,7 @@ public class LocaleProducer {
 
     @Produces @DefaultLocale
     public Locale defaultLocale(){
-        return new Locale("de", "DE");
+        return new Locale("en", "EN");
     }
 
 }

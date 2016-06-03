@@ -1,4 +1,4 @@
-package org.pode.cosmos.exceptionHandling.model.jaxbAdapters;
+package org.pode.cosmos.domain.exceptions.jaxbAdapters;
 
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.adapters.XmlAdapter;

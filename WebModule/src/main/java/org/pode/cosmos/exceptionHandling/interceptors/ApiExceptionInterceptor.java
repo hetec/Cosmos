@@ -1,7 +1,7 @@
 package org.pode.cosmos.exceptionHandling.interceptors;
 
-import org.pode.cosmos.appconfig.DefaultLocale;
-import org.pode.cosmos.exceptionHandling.model.ApiException;
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
+import org.pode.cosmos.domain.exceptions.ApiException;
 
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;

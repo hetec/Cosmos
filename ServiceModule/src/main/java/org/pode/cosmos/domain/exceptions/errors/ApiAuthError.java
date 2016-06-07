@@ -8,7 +8,8 @@ import javax.ws.rs.core.Response;
 public enum ApiAuthError implements ApiError{
 
     A1001(Response.Status.UNAUTHORIZED, "auth_failed_login"),
-    A1002(Response.Status.NOT_FOUND, "auth_not_found_for_username");
+    A1002(Response.Status.NOT_FOUND, "auth_not_found_for_username"),
+    A1003(Response.Status.BAD_REQUEST, "auth_account_already_exists");
 
     private Response.Status status;
     private String messageKey;

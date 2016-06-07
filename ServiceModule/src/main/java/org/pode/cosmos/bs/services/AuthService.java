@@ -14,6 +14,7 @@ import org.pode.cosmos.domain.exceptions.NoSuchAccountException;
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -61,10 +62,22 @@ public class AuthService implements AuthServiceLocal {
         profile.setUsername(credentials.getUsername());
         profile.setPassword(credentials.getPassword());
         profile.setEmail(credentials.getEmail());
-        em.persist(profile);
-        return profile;
+        try {
+            TypedQuery<UserProfile> query = em.createNamedQuery(
+                    "userCredentials.findByUserName",
+                    UserProfile.class);
+            query.setParameter(USERNAME_PARAM, credentials.getUsername());
+            query.getSingleResult();
+        }catch (NoResultException noResult){
+            em.persist(profile);
+            return profile;
+        }catch (Exception invalidResult){
+            throw new IllegalStateException(invalidResult.getMessage());
+        }
+        throw new ApiException(ApiAuthError.A1003, locale);
     }
 
+    @Override
     public String loginUser(Credentials credentials){
         try {
             TypedQuery<UserProfile> query = em.createNamedQuery(

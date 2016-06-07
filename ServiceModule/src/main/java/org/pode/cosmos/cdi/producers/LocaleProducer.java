@@ -14,7 +14,7 @@ public class LocaleProducer {
 
     @Produces @DefaultLocale
     public Locale defaultLocale(){
-        return new Locale("en", "EN");
+        return new Locale("en", "US");
     }
 
 }

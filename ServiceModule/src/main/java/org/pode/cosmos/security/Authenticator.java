@@ -47,8 +47,7 @@ public class Authenticator {
             throw new IllegalStateException("Wrong key specification");
         }
         Base64.Encoder enc = Base64.getEncoder();
-        String saltAndHash = enc.encodeToString(salt) + SEPARATOR + enc.encodeToString(hash);
-        return saltAndHash;
+        return enc.encodeToString(salt) + SEPARATOR + enc.encodeToString(hash);
     }
 
     private byte[] buildSalt(){

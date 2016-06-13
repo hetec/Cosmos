@@ -5,6 +5,7 @@ import org.pode.cosmos.domain.exceptions.ConstraintViolationEntry;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -13,9 +14,12 @@ import javax.ws.rs.ext.Provider;
 import java.util.*;
 
 /**
- * Created by patrick on 28.05.16.
+ * Maps ConstraintViolationException to appropriate response. Tje response contains a list
+ * with the detected violations. Each violation entry comprises the information about the
+ * concerned fields name, the invalid value and the message of the violation.
  */
 @Provider
+@Produces("application/json")
 public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViolationException>{
 
     @Override
@@ -33,7 +37,7 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
     }
 
     private List<ConstraintViolationEntry> consolidateConstraintViolations(Set<ConstraintViolation<?>> violations){
-        List<ConstraintViolationEntry> violationList = new ArrayList();
+        List<ConstraintViolationEntry> violationList = new ArrayList<>();
         for (ConstraintViolation<?> violation : violations){
             Iterator<Path.Node> iterator = violation.getPropertyPath().iterator();
             Path.Node field = null;
@@ -45,12 +49,16 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
                 }
             }
             String invalidValueString = "";
+            String name = "";
             Object invalidValue = violation.getInvalidValue();
             if(Objects.nonNull(invalidValue)){
                 invalidValueString = invalidValue.toString();
             }
+            if(Objects.nonNull(field)){
+                name = field.getName();
+            }
             ConstraintViolationEntry entry = new ConstraintViolationEntry(
-                    field.getName(),
+                    name,
                     invalidValueString,
                     violation.getMessage()
                     );

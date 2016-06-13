@@ -1,22 +1,21 @@
 package org.pode.cosmos.exceptionHandling.mapper;
 
-
-import javax.ws.rs.NotFoundException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Maps NotFoundExceptions to appropriate responses
+ * Maps NotSupportedExceptions to appropriate responses
  */
 @Provider
-public class NotFoundMapper implements ExceptionMapper<NotFoundException>{
+public class NotSupportedMapper implements ExceptionMapper<NotSupportedException>{
 
     @Override
-    public Response toResponse(NotFoundException exception) {
-        return Response
-                .status(Response.Status.NOT_FOUND)
+    public Response toResponse(javax.ws.rs.NotSupportedException exception) {
+        return Response.status(Response
+                .Status.UNSUPPORTED_MEDIA_TYPE)
                 .entity(exception.getMessage())
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();

@@ -14,10 +14,9 @@ import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 import org.pode.cosmos.exceptionHandling.mapper.GenericExceptionMapper;
 import org.pode.cosmos.exceptionHandling.mapper.NoSuchEntityForIdMapper;
-import org.pode.cosmos.exceptionHandling.mapper.NotSupportedMediaTypeMapper;
+import org.pode.cosmos.exceptionHandling.mapper.NotSupportedMapper;
 import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.time.LocalDate;
@@ -48,7 +47,7 @@ public class SocialContactResourceTest extends JerseyTest{
         res.register(SocialContactResource.class);
         res.register(NoSuchEntityForIdMapper.class);
         res.register(GenericExceptionMapper.class);
-        res.register(NotSupportedMediaTypeMapper.class);
+        res.register(NotSupportedMapper.class);
         return res;
     }
 
@@ -69,7 +68,7 @@ public class SocialContactResourceTest extends JerseyTest{
     @Test
     public void getAllContacts_wrongMediaType_NotSupportedMediaType(){
         ExceptionInfo ei = new ExceptionInfo(
-                NotSupportedException.class.getName(),
+                javax.ws.rs.NotSupportedException.class.getName(),
                 "HTTP 415 Unsupported Media Type",
                 "Supported media types: application/json"
         );

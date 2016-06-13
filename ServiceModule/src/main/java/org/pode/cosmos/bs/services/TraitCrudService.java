@@ -2,13 +2,11 @@ package org.pode.cosmos.bs.services;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
-import org.pode.cosmos.bs.serviceUtils.ErrorType;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
 import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.entities.Traits;
 import org.pode.cosmos.domain.exceptions.ApiException;
-import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
 import org.pode.cosmos.domain.exceptions.errors.ApiSocialContactError;
 import org.pode.cosmos.domain.exceptions.errors.ApiTraitError;
 

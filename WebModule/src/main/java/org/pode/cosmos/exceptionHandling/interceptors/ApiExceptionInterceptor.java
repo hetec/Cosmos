@@ -23,13 +23,13 @@ public class ApiExceptionInterceptor {
         try {
             returnedResponse = invocationContext.proceed();
         } catch (Exception e) {
-            Response errorResponse = null;
+            Response errorResponse;
             if(e instanceof ApiException){
                 errorResponse = ((ApiException)e).getResponse();
             }else if(e.getCause() instanceof ApiException){
                 errorResponse = ((ApiException)e.getCause()).getResponse();
             }else {
-                errorResponse = (new ApiException(e, locale)).getResponse();
+                errorResponse = (new ApiException(e)).getResponse();
             }
             return errorResponse;
         }

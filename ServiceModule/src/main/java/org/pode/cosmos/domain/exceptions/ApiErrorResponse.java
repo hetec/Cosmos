@@ -48,9 +48,16 @@ public class ApiErrorResponse {
     }
 
     public ApiErrorResponse(
-            final Exception exception,
-            final Locale locale) {
+            final Throwable throwable) {
         this.status = Response.Status.INTERNAL_SERVER_ERROR;
+        this.errorCode = "0";
+        this.errorMessage = throwable.getLocalizedMessage();
+    }
+
+    public ApiErrorResponse(
+            final Exception exception,
+            final Response.Status status){
+        this.status = status;
         this.errorCode = "0";
         this.errorMessage = exception.getLocalizedMessage();
     }

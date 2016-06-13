@@ -23,11 +23,10 @@ public class ApiException extends RuntimeException {
                 ));
     }
 
-    public ApiException(final Exception exception, final Locale locale){
+    public ApiException(final Exception exception){
         this.response = this.buildHttpResponse(
                 new ApiErrorResponse(
-                        exception,
-                        locale
+                        exception
                 ));
     }
 

@@ -1,5 +1,7 @@
 package org.pode.cosmos.exceptionHandling.mapper;
 
+import org.pode.cosmos.domain.exceptions.ApiErrorResponse;
+
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,7 +18,7 @@ public class NotAuthorizedMapper implements ExceptionMapper<NotAuthorizedExcepti
     public Response toResponse(NotAuthorizedException exception) {
         return Response
                 .status(Response.Status.UNAUTHORIZED)
-                .entity(exception.getMessage())
+                .entity(new ApiErrorResponse(exception, Response.Status.UNAUTHORIZED))
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .build();
     }

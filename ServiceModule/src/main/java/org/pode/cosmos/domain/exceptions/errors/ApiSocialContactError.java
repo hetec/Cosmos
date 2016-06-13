@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
  */
 public enum ApiSocialContactError implements ApiError {
 
-    SC10001(Response.Status.BAD_REQUEST, "social_contact_not_found_for_id");
+    SC10001(Response.Status.NOT_FOUND, "social_contact_not_found_for_id");
 
     private Response.Status status;
     private String messageKey;

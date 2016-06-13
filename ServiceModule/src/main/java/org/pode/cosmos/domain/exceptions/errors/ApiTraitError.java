@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
  */
 public enum ApiTraitError implements ApiError {
 
-    T10001(Response.Status.BAD_REQUEST, "trait_not_found_for_id"),
+    T10001(Response.Status.NOT_FOUND, "trait_not_found_for_id"),
     T10002(Response.Status.CONFLICT, "invalid_social_contact_id_for_trait");
 
     private Response.Status status;

@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -51,7 +52,7 @@ public class ApiErrorResponse {
             final Throwable throwable) {
         this.status = Response.Status.INTERNAL_SERVER_ERROR;
         this.errorCode = "0";
-        this.errorMessage = throwable.getLocalizedMessage();
+        this.errorMessage = getLocalizedErrorMsg(throwable);
     }
 
     public ApiErrorResponse(
@@ -59,7 +60,7 @@ public class ApiErrorResponse {
             final Response.Status status){
         this.status = status;
         this.errorCode = "0";
-        this.errorMessage = exception.getLocalizedMessage();
+        this.errorMessage = getLocalizedErrorMsg(exception);
     }
 
     public Response.Status getStatus() {
@@ -102,5 +103,14 @@ public class ApiErrorResponse {
                 RESOURCE_BUNDLE_BASENAME,
                 locale);
         return bundle.getString(msgKey);
+    }
+
+    private String getLocalizedErrorMsg(
+            final Throwable throwable){
+        final String msg = throwable.getMessage();
+        if(Objects.isNull(msg) || msg.trim().isEmpty()){
+            return throwable.getClass().getSimpleName();
+        }
+        return msg;
     }
 }

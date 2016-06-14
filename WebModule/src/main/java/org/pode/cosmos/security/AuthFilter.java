@@ -1,18 +1,23 @@
 package org.pode.cosmos.security;
 
 import io.jsonwebtoken.JwtException;
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
+import org.pode.cosmos.domain.exceptions.ApiErrorResponse;
+import org.pode.cosmos.domain.exceptions.errors.ApiAuthError;
+import org.pode.cosmos.domain.exceptions.errors.ApiError;
 import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -21,20 +26,26 @@ import java.util.Objects;
  */
 @Provider
 @Secured
+@Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter{
 
     private static final String PREFIX = "BEARER";
     private static final int TOKEN_PARTS = 2;
     private static final int TOKEN_INDEX = 1;
     private static final String SEPARATOR = " ";
-    private static final long TIME_TO_LIVE = 1000 * 60;
 
 
+    private HttpServletRequest request;
     private JwtGenerator jwtGenerator;
+    private Locale locale;
 
     @Inject
-    public AuthFilter(JwtGenerator jwtGenerator){
+    public AuthFilter(final JwtGenerator jwtGenerator,
+                      final @DefaultLocale Locale locale,
+                      final @Context HttpServletRequest request){
         this.jwtGenerator = jwtGenerator;
+        this.locale = locale;
+        this.request = request;
     }
 
     /**
@@ -47,49 +58,56 @@ public class AuthFilter implements ContainerRequestFilter{
     public void filter(final ContainerRequestContext requestContext) throws IOException {
         // Get authorization header
         final String authHeader = requestContext.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if(!authHeader.startsWith(PREFIX)){
-            abortProcess(requestContext, buildDefaultResponse("Starts not with 'BEARER'"));
-        }
-        // Get the token
-        final String[] tokenParts = extractToken(authHeader);
-        String token;
-        if(tokenParts.length == TOKEN_PARTS){
-            token = tokenParts[TOKEN_INDEX];
-            if(Objects.isNull(token) || token.trim().isEmpty()){
-                abortProcess(requestContext, buildDefaultResponse("Token does not exist"));
-            } else {
-                // Verify the token
-                try{
-                    final String subject = jwtGenerator.verifyJwt(token);
+        if(Objects.isNull(authHeader)){
+            abortProcess(requestContext, buildDefaultResponse(ApiAuthError.A1006));
+        }else{
+            if(!authHeader.startsWith(PREFIX)){
+                abortProcess(requestContext, buildDefaultResponse(ApiAuthError.A1004));
+            }else{
+                // Get the token
+                final String[] tokenParts = extractToken(authHeader);
+                String token;
+                if(tokenParts.length == TOKEN_PARTS){
+                    token = tokenParts[TOKEN_INDEX];
+                    if(Objects.isNull(token) || token.trim().isEmpty()){
+                        abortProcess(requestContext, buildDefaultResponse(ApiAuthError.A1006));
+                    } else {
+                        // Verify the token
+                        try{
+                            final String subject = jwtGenerator.verifyJwt(token);
 
-                    requestContext.setSecurityContext(new SecurityContext() {
-                        @Override
-                        public Principal getUserPrincipal() {
-                            return () -> subject;
-                        }
+                            requestContext.setSecurityContext(new SecurityContext() {
+                                @Override
+                                public Principal getUserPrincipal() {
+                                    return () -> subject;
+                                }
 
-                        @Override
-                        public boolean isUserInRole(String role) {
-                            return true;
-                        }
+                                @Override
+                                public boolean isUserInRole(String role) {
+                                    return true;
+                                }
 
-                        @Override
-                        public boolean isSecure() {
-                            return false;
-                        }
+                                @Override
+                                public boolean isSecure() {
+                                    return request.isSecure();
+                                }
 
-                        @Override
-                        public String getAuthenticationScheme() {
-                            return null;
+                                @Override
+                                public String getAuthenticationScheme() {
+                                    return null;
+                                }
+                            });
+                        } catch (JwtException jwtEx){
+                            abortProcess(requestContext, buildDefaultResponse(ApiAuthError.A1007));
                         }
-                    });
-                } catch (JwtException jwtEx){
-                    abortProcess(requestContext, buildDefaultResponse(jwtEx.getMessage()));
+                    }
+                }else {
+                    abortProcess(requestContext, buildDefaultResponse(ApiAuthError.A1005));
                 }
             }
-        }else {
-            abortProcess(requestContext, buildDefaultResponse("Invalid separator or format"));
+
         }
+
     }
 
     private String[] extractToken(final String authString){
@@ -102,13 +120,10 @@ public class AuthFilter implements ContainerRequestFilter{
         requestContext.abortWith(response);
     }
 
-    private Response buildDefaultResponse(final String reason){
+    private Response buildDefaultResponse(final ApiError error){
         return Response
-                .status(Response.Status.UNAUTHORIZED)
-                .entity(new ExceptionInfo(
-                        AuthFilter.class.getSimpleName(),
-                        reason,
-                        "USE -> 'BEARER token' in the authorization header"))
+                .status(error.getStatus())
+                .entity(new ApiErrorResponse(error, locale))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
     }

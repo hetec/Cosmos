@@ -34,7 +34,7 @@ public class Authenticator {
     }
 
     private String createPwHash(final String password, byte[] salt){
-        byte[] hash = null;
+        byte[] hash;
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LEN);
         try {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGO);

@@ -1,4 +1,4 @@
-package org.pode.cosmos.auth;
+package org.pode.cosmos.security;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -22,6 +22,7 @@ public class Authenticator {
     final static int ITERATIONS = 20*1000;
     final static int KEY_LEN = 256;
     final static String ALGO = "PBKDF2WithHmacSHA512";
+    final static String SEPARATOR = "$";
 
     /**
      * Creates a salted password hash with the PBKDF2 algorithm
@@ -33,21 +34,20 @@ public class Authenticator {
     }
 
     private String createPwHash(final String password, byte[] salt){
-        byte[] hash = null;
+        byte[] hash;
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LEN);
         try {
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(ALGO);
             hash = keyFactory.generateSecret(spec).getEncoded();
         } catch (NoSuchAlgorithmException algoEx){
             algoEx.printStackTrace();
-            //This should never happen
+            throw new IllegalStateException("Wrong algorithm");
         } catch (InvalidKeySpecException specEx) {
             specEx.printStackTrace();
-            //This should never happen
+            throw new IllegalStateException("Wrong key specification");
         }
         Base64.Encoder enc = Base64.getEncoder();
-        String saltAndHash = enc.encodeToString(salt) + "$" + enc.encodeToString(hash);
-        return saltAndHash;
+        return enc.encodeToString(salt) + SEPARATOR + enc.encodeToString(hash);
     }
 
     private byte[] buildSalt(){

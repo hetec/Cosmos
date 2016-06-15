@@ -27,15 +27,15 @@ public class UserProfile implements Serializable{
     private Long id;
 
     @Column(length = 20, nullable = false, unique = true)
-    @Pattern(regexp = "[a-zA-Z]{5,20}")
+//    @Pattern(regexp = "[a-zA-Z]{5,20}")
     private String username;
 
-    @NotNull
+//    @NotNull
     private String password;
 
     @Column(length = 50, nullable = false)
-    @NotNull
-    @Size(min = 6)
+//    @NotNull
+//    @Size(min = 6)
     private String email;
 
     public UserProfile(){

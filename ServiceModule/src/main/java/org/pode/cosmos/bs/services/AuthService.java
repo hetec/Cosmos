@@ -1,7 +1,10 @@
 package org.pode.cosmos.bs.services;
 
-import org.pode.cosmos.auth.Authenticator;
-import org.pode.cosmos.auth.JwtGenerator;
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
+import org.pode.cosmos.domain.exceptions.ApiException;
+import org.pode.cosmos.domain.exceptions.errors.ApiAuthError;
+import org.pode.cosmos.security.Authenticator;
+import org.pode.cosmos.security.JwtGenerator;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
 import org.pode.cosmos.domain.auth.Credentials;
@@ -9,11 +12,14 @@ import org.pode.cosmos.domain.entities.UserProfile;
 import org.pode.cosmos.domain.exceptions.NoSuchAccountException;
 
 import javax.ejb.Stateless;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.NotAuthorizedException;
+import java.util.Locale;
 
 /**
  * Created by patrick on 02.04.16.
@@ -26,18 +32,22 @@ public class AuthService implements AuthServiceLocal {
 
     private final static String USERNAME_PARAM = "username";
     private final static long TIME_TO_LIVE_JWT = 1000 * 60; // 1 min
+    private final static String ISSUER = "Cosomos";
 
     private EntityManager em;
     private Authenticator authenticator;
     private JwtGenerator jwtGenerator;
+    private Locale locale;
 
     @Inject
     AuthService(@CosmosCtx EntityManager em,
                 Authenticator authenticator,
-                JwtGenerator jwtGenerator){
+                JwtGenerator jwtGenerator,
+                @DefaultLocale Locale locale){
         this.em = em;
         this.authenticator = authenticator;
         this.jwtGenerator = jwtGenerator;
+        this.locale = locale;
     }
 
     public AuthService(){}
@@ -52,10 +62,22 @@ public class AuthService implements AuthServiceLocal {
         profile.setUsername(credentials.getUsername());
         profile.setPassword(credentials.getPassword());
         profile.setEmail(credentials.getEmail());
-        em.persist(profile);
-        return profile;
+        try {
+            TypedQuery<UserProfile> query = em.createNamedQuery(
+                    "userCredentials.findByUserName",
+                    UserProfile.class);
+            query.setParameter(USERNAME_PARAM, credentials.getUsername());
+            query.getSingleResult();
+        }catch (NoResultException noResult){
+            em.persist(profile);
+            return profile;
+        }catch (Exception invalidResult){
+            throw new IllegalStateException(invalidResult.getMessage());
+        }
+        throw new ApiException(ApiAuthError.A1003, locale);
     }
 
+    @Override
     public String loginUser(Credentials credentials){
         try {
             TypedQuery<UserProfile> query = em.createNamedQuery(
@@ -66,15 +88,14 @@ public class AuthService implements AuthServiceLocal {
             if(!authenticator.checkCredentials(
                     credentials.getPassword(),
                     userProfile.getPassword())){
-                throw new NotAuthorizedException("Not authorized");
+                throw new ApiException(ApiAuthError.A1001, locale);
             }
-            return jwtGenerator.createJwt(userProfile.getUsername(), "Cosomos", TIME_TO_LIVE_JWT);
+            return jwtGenerator.createJwt(userProfile.getUsername(), ISSUER, TIME_TO_LIVE_JWT);
         } catch (NoResultException noResult){
-            throw new NoSuchAccountException(credentials);
+            throw new ApiException(ApiAuthError.A1002, locale);
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new NoSuchAccountException(credentials);
-            //log cause
+            throw new ApiException(ApiAuthError.A1002, locale);
         }
     }
 }

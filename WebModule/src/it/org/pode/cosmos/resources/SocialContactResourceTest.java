@@ -11,13 +11,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
 import org.pode.cosmos.domain.entities.SocialContact;
-import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
-import org.pode.cosmos.exceptions.handler.GenericExceptionMapper;
-import org.pode.cosmos.exceptions.handler.NoSuchEntityForIdMapper;
-import org.pode.cosmos.exceptions.handler.NotSupportedMediaTypeMapper;
-import org.pode.cosmos.exceptions.model.ExceptionInfo;
+import org.pode.cosmos.exceptionHandling.interceptors.ApiExceptionInterceptor;
+import org.pode.cosmos.exceptionHandling.mapper.GenericExceptionMapper;
+import org.pode.cosmos.exceptionHandling.mapper.NotSupportedMapper;
+import org.pode.cosmos.exceptionHandling.model.ExceptionInfo;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.time.LocalDate;
@@ -46,9 +44,9 @@ public class SocialContactResourceTest extends JerseyTest{
         ResourceConfig res = new ResourceConfig();
         res.register(new TestBinder());
         res.register(SocialContactResource.class);
-        res.register(NoSuchEntityForIdMapper.class);
         res.register(GenericExceptionMapper.class);
-        res.register(NotSupportedMediaTypeMapper.class);
+        res.register(NotSupportedMapper.class);
+        res.register(ApiExceptionInterceptor.class);
         return res;
     }
 
@@ -66,19 +64,6 @@ public class SocialContactResourceTest extends JerseyTest{
         verifyMediatypeIsAppJson(response);
     }
 
-    @Test
-    public void getAllContacts_wrongMediaType_NotSupportedMediaType(){
-        ExceptionInfo ei = new ExceptionInfo(
-                NotSupportedException.class.getName(),
-                "HTTP 415 Unsupported Media Type",
-                "Supported media types: application/json"
-        );
-        Response response = target("/contacts")
-                .request().header("Content-Type", MediaType.APPLICATION_XML)
-                .get(Response.class);
-
-        verifyExceptionInfo(response,ei);
-    }
 
     @Test
     public void getAllContacts_noExistingEntity_EmptyList(){
@@ -123,19 +108,6 @@ public class SocialContactResourceTest extends JerseyTest{
         Response response = target("/contacts/1").request().get(Response.class);
 
         verifySocialContactProperties(response, matcher);
-    }
-
-    @Test
-    public void getContactById_NoEntityExistsForId_ExceptionInfo(){
-        final ExceptionInfo ei = new ExceptionInfo(
-                NoSuchEntityForIdException.class.getName(),
-                "error",
-                "The entity with the id #1 does not exist");
-        final long ID = 1L;
-        when(service.findById(1L)).thenThrow(new NoSuchEntityForIdException(ID, ei.getErrorMsg()));
-
-        Response response = target("/contacts/1").request().get(Response.class);
-        verifyExceptionInfo(response, ei);
     }
 
     @Test
@@ -200,21 +172,6 @@ public class SocialContactResourceTest extends JerseyTest{
     }
 
     @Test
-    public void updateContact_NoEntityForId_NoSuchEntityForIdException(){
-        ExceptionInfo ei = new ExceptionInfo(
-                NoSuchEntityForIdException.class.getName(),
-                "error",
-                "The entity with the id #1 does not exist"
-        );
-        when(service.update(any(SocialContact.class))).thenThrow(
-                new NoSuchEntityForIdException(1L, ei.getErrorMsg()));
-
-        Response response = target("/contacts/1").request().put(wrapIntoEntity(createTestContact()));
-
-        verifyExceptionInfo(response, ei);
-    }
-
-    @Test
     public void deleteContact_noProblems_StatusCodeOK(){
         Response response = target("/contacts/1").request().delete();
 
@@ -239,19 +196,6 @@ public class SocialContactResourceTest extends JerseyTest{
         verifySocialContactProperties(response, matcher);
     }
 
-    @Test
-    public void deleteContact_noSuchEntity_NoSuchEntityForIdException(){
-        ExceptionInfo ei = new ExceptionInfo(
-                NoSuchEntityForIdException.class.getName(),
-                "error",
-                "The entity with the id #1 does not exist"
-        );
-        when(service.delete(1L)).thenThrow(new NoSuchEntityForIdException(1L, ei.getErrorMsg()));
-
-        Response response = target("/contacts/1").request().delete();
-
-        verifyExceptionInfo(response, ei);
-    }
 
     //Helper
     private static SocialContact createTestContact(){

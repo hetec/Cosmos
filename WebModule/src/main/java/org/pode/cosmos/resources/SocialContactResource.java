@@ -5,10 +5,12 @@ import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
 import org.pode.cosmos.bs.services.SocialContactCrudService;
 import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.entities.Traits;
+import org.pode.cosmos.exceptionHandling.interceptors.ApiExceptionInterceptor;
 
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
@@ -21,6 +23,7 @@ import java.util.List;
 @Path("/contacts")
 @Produces("application/json")
 @Consumes("application/json")
+@Interceptors({ApiExceptionInterceptor.class})
 public class SocialContactResource{
 
     private SocialContactCrudServiceLocal socialContactCrudService;

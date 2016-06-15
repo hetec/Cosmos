@@ -2,15 +2,18 @@ package org.pode.cosmos.bs.services;
 
 import org.pode.cosmos.bs.interfaces.SocialContactCrudServiceLocal;
 import org.pode.cosmos.bs.interfaces.TraitCrudServiceLocal;
-import org.pode.cosmos.bs.serviceUtils.ErrorType;
 import org.pode.cosmos.cdi.qualifiers.CosmosCtx;
+import org.pode.cosmos.cdi.qualifiers.DefaultLocale;
 import org.pode.cosmos.domain.entities.SocialContact;
 import org.pode.cosmos.domain.entities.Traits;
-import org.pode.cosmos.domain.exceptions.NoSuchEntityForIdException;
+import org.pode.cosmos.domain.exceptions.ApiException;
+import org.pode.cosmos.domain.exceptions.errors.ApiSocialContactError;
+import org.pode.cosmos.domain.exceptions.errors.ApiTraitError;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +26,7 @@ public class TraitCrudService implements TraitCrudServiceLocal{
 
     private EntityManager em;
     private SocialContactCrudServiceLocal contactService;
+    private Locale locale;
 
 
     public TraitCrudService() {}
@@ -30,25 +34,22 @@ public class TraitCrudService implements TraitCrudServiceLocal{
     @Inject
     public TraitCrudService(
             @CosmosCtx EntityManager em,
-            SocialContactCrudServiceLocal contactService){
+            SocialContactCrudServiceLocal contactService,
+            @DefaultLocale Locale locale){
         this.em = em;
         this.contactService = contactService;
+        this.locale = locale;
     }
 
     @Override
     public Traits findById(Long traitId, Long contactId) {
         Traits foundTrait = em.find(Traits.class, traitId);
         if(!Objects.nonNull(foundTrait)){
-            throw new NoSuchEntityForIdException(
-                    traitId,
-                    ErrorType.FIND.getMsg(Traits.class));
+            throw new ApiException(ApiTraitError.T10001, locale);
         }
         final Long traitContact = foundTrait.getContact().getId();
         if(!traitContact.equals(contactId)){
-            throw new NoSuchEntityForIdException(
-                    contactId,
-                    ErrorType.FIND.getMsg(SocialContact.class)
-            );
+            throw new ApiException(ApiTraitError.T10002, locale);
         }
         return foundTrait;
     }
@@ -90,9 +91,7 @@ public class TraitCrudService implements TraitCrudServiceLocal{
                 .findFirst();
         //Check if the trait is not null
         if(!Objects.nonNull(trait.get())){
-            throw new NoSuchEntityForIdException(
-                    traitId,
-                    ErrorType.DELETE.getMsg(Traits.class));
+            throw new ApiException(ApiTraitError.T10001, locale);
         }
         //Remove the trait form the list and through cascading from the db
         sc.removeTrait(trait.get());
@@ -103,11 +102,8 @@ public class TraitCrudService implements TraitCrudServiceLocal{
     private SocialContact findAndCheckSocialContact(Long contactId){
         SocialContact sc = em.find(SocialContact.class, contactId);
         if(!Objects.nonNull(sc)){
-            throw new NoSuchEntityForIdException(
-                    contactId,
-                    ErrorType.FIND.getMsg(SocialContact.class));
+            throw new ApiException(ApiSocialContactError.SC10001, locale);
         }
-
         return sc;
     }
 }

@@ -1,17 +1,14 @@
 package org.pode.cosmos.resources;
 
-import org.pode.cosmos.annotations.Secured;
-import org.pode.cosmos.auth.ApiKey;
-import org.pode.cosmos.auth.JwtGenerator;
+import org.pode.cosmos.exceptionHandling.interceptors.ApiExceptionInterceptor;
+import org.pode.cosmos.security.Secured;
+import org.pode.cosmos.security.JwtGenerator;
 import org.pode.cosmos.bs.interfaces.AuthServiceLocal;
 import org.pode.cosmos.domain.auth.Credentials;
 
 import javax.inject.Inject;
-import javax.mail.Header;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.interceptor.Interceptors;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
 
@@ -19,6 +16,9 @@ import java.io.IOException;
  * Created by patrick on 03.04.16.
  */
 @Path("/signIn")
+@Consumes("application/json")
+@Produces("application/json")
+@Interceptors({ApiExceptionInterceptor.class})
 public class signInResource {
 
     private AuthServiceLocal authService;
